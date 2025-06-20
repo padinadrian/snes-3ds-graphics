@@ -1,0 +1,36 @@
+/************************************************************\
+Filename:   version.cpp
+Author:     Adrian Padin (padin.adrian@gmail.com)
+Description:
+    This generated source file contains the version
+    information contained in strings. To use these strings,
+    include "version.hpp" in your source file.
+
+\************************************************************/
+
+
+/* ===== Includes ===== */
+#include "version.hpp"
+
+
+namespace version {
+
+    // The version major number
+    const std::string VERSION_MAJOR = "${${PROJECT_NAME}_VERSION_MAJOR}";
+
+    // The version minor number
+    const std::string VERSION_MINOR = "${${PROJECT_NAME}_VERSION_MINOR}";
+
+    // The version bugfix number
+    const std::string VERSION_BUGFIX = "${${PROJECT_NAME}_VERSION_BUGFIX}";
+
+    // The SHA1 hash of the HEAD git commit
+    const std::string VERSION_GIT_SHA1 = "${GIT_SHA1}";
+
+    // All strings combined
+    const std::string VERSION_FULL =
+        VERSION_MAJOR + "." +
+        VERSION_MINOR + "." +
+        VERSION_BUGFIX + "." +
+        VERSION_GIT_SHA1.substr(0, 7);
+}

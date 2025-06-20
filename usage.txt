@@ -1,0 +1,3 @@
+Usage: myprogram <arguments> [options]
+
+Report bugs to Adrian Padin: <padin.adrian@gmail.com>
