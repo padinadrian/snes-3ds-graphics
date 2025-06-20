@@ -19,7 +19,7 @@ set(${PROJECT_NAME}_VERSION_FULL
 file(WRITE "${CMAKE_BINARY_DIR}/version" "${${PROJECT_NAME}_VERSION_FULL}\n")
 
 # Universal settings
-include_directories("${CMAKE_SOURCE_DIR}/include")
+include_directories("${CMAKE_SOURCE_DIR}/source")
 
 # Output directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

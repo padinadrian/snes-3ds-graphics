@@ -12,7 +12,7 @@ add_executable(${PROJECT_NAME}
 # Create usage info header
 set(USAGE_TXT "${CMAKE_SOURCE_DIR}/usage.txt")
 set(USAGE_HPP "${CMAKE_CURRENT_BINARY_DIR}/usage.hpp")
-set(USAGE_PY "${CMAKE_SOURCE_DIR}/configure_usage.py")
+set(USAGE_PY "${CMAKE_SOURCE_DIR}/tools/configure_usage.py")
 add_custom_command(
     OUTPUT ${USAGE_HPP}
     COMMAND python ${USAGE_PY} ${USAGE_TXT} ${USAGE_HPP}

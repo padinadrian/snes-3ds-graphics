@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BUILD_DIR="build.local"
+BUILD_DIR="build"
 TEST_FILENAME="$BUILD_DIR/bin/run_tests"
 
 rm $TEST_FILENAME
