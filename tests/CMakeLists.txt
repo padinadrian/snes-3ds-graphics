@@ -2,8 +2,9 @@
 
 # List unit test source files
 add_executable(run_tests
-    # Test filenames go here
-    example_test.cpp
+    ../source/background.c
+    background_tests.cpp
+    snes_objects_tests.cpp
 )
 
 # Add dependent libraries

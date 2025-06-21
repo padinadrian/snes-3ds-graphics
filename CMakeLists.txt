@@ -4,8 +4,8 @@ project(snes_3ds_graphics)
 
 # Version information
 set(${PROJECT_NAME}_VERSION_MAJOR 0)
-set(${PROJECT_NAME}_VERSION_MINOR 2)
-set(${PROJECT_NAME}_VERSION_BUGFIX 1)
+set(${PROJECT_NAME}_VERSION_MINOR 1)
+set(${PROJECT_NAME}_VERSION_BUGFIX 0)
 
 # Add git version info and generate version source
 # Take from https://stackoverflow.com/a/4318642/5179394

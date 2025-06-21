@@ -4,8 +4,9 @@
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/version.cpp")
 
 # Create binary executable
-add_executable(${PROJECT_NAME}
-    main.cpp
+add_library(${PROJECT_NAME}
+    background.c
+    snes.c
     "${CMAKE_CURRENT_BINARY_DIR}/version.cpp"
 )
 
