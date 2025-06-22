@@ -4,7 +4,7 @@ Translation layer for running SNES graphics on the 3DS.
 
 Note that this is NOT intended to be a SNES emulator for 3DS - it is only a translation layer intended to simulate how SNES graphics are rendered.
 
-This project was specifically created to aid in the [native 3DS port of Zelda: A Link to the Past](https://github.com/padinadrian/zelda3-3ds).
+This project was specifically created to aid in the [native 3DS port of Zelda 3](https://github.com/padinadrian/zelda3-3ds).
 
 ## Building and Running Tests
 
