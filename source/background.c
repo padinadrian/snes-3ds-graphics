@@ -1,7 +1,90 @@
+//! Functions for encoding and decoding tiles in VRAM.
 
+/* ========== Includes ========== */
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
+/* ========== Functions ========== */
+
+/**
+ * @brief Helper function for encoding one row of a tile into a tile buffer.
+ *
+ * @param output_vram Pointer to destination buffer in VRAM
+ * @param input_buf Pointer to input buffer of palette IDs
+ * @param shift Amount to shift the palette ID down before reading the value
+ */
+void tile_encode_helper(
+        uint16_t* output_vram,
+        const uint8_t* palette_ids,
+        const uint16_t shift)
+{
+    uint16_t upper = 0, lower = 0;
+    for (size_t i = 0; i < 8; ++i, lower <<= 1, upper <<= 1) {
+        lower |= (palette_ids[i] >> shift) & 1;
+        upper |= ((palette_ids[i] >> shift) & 2) >> 1;
+    }
+    *output_vram = (upper << 7) | (lower >> 1);
+}
+
+/**
+ * @brief Encode a single tile into a tile buffer in 2bpp format.
+ *
+ * @param output_vram Pointer to destination buffer in VRAM
+ * @param input_buf Pointer to input buffer of palette IDs
+ */
+void tile_encode_2bpp(uint16_t* output_vram, const uint8_t* palette_ids)
+{
+    for (size_t i = 0; i < 8; ++i) {
+        tile_encode_helper(output_vram + i, palette_ids + (i * 8), 0);
+    }
+}
+
+/**
+ * @brief Encode a single tile into a tile buffer in 4bpp format.
+ *
+ * @param output_vram Pointer to destination buffer in VRAM
+ * @param input_buf Pointer to input buffer of palette IDs
+ */
+void tile_encode_4bpp(uint16_t* output_vram, const uint8_t* palette_ids)
+{
+    // First 16 bytes are bit planes 0 and 1
+    for (size_t i = 0; i < 8; ++i) {
+        tile_encode_helper(output_vram + i, palette_ids, 0);
+    }
+    // Second 16 bytes are bit planes 2 and 3
+    for (size_t i = 8; i < 16; ++i) {
+        tile_encode_helper(output_vram + i, palette_ids, 2);
+    }
+}
+
+/**
+ * @brief Encode a single tile into a tile buffer in 8bpp format.
+ *
+ * @param output_vram Pointer to destination buffer in VRAM
+ * @param input_buf Pointer to input buffer of palette IDs
+ */
+void tile_encode_8bpp(uint16_t* output_vram, const uint8_t* palette_ids)
+{
+    // First 16 bytes are bit planes 0 and 1
+    for (size_t i = 0; i < 8; ++i) {
+        tile_encode_helper(output_vram + i, palette_ids, 0);
+    }
+    // Second 16 bytes are bit planes 2 and 3
+    for (size_t i = 8; i < 16; ++i) {
+        tile_encode_helper(output_vram + i, palette_ids, 2);
+    }
+    // Third 16 bytes are bit planes 4 and 5
+    for (size_t i = 16; i < 24; ++i) {
+        tile_encode_helper(output_vram + i, palette_ids, 4);
+    }
+    // Fourth 16 bytes are bit planes 6 and 7
+    for (size_t i = 24; i < 32; ++i) {
+        tile_encode_helper(output_vram + i, palette_ids, 6);
+    }
+}
+
+
 
 
 void translate_tile(uint32_t* output, uint8_t* input, size_t length, uint32_t bit_depth) {
