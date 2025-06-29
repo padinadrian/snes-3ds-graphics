@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-
 /* ========== Functions ========== */
 
 /**
@@ -33,6 +32,12 @@ void tile_encode_4bpp(uint16_t* output_vram, const uint8_t* palette_ids);
  */
 void tile_encode_8bpp(uint16_t* output_vram, const uint8_t* palette_ids);
 
-// TODO: Encode functions
+/**
+ * @brief Decode a single tile from a tile buffer in 2bpp format.
+ *
+ * @param output_buf Pointer to destination buffer of palette IDs
+ * @param input_vram Pointer to input buffer of tile data in VRAM
+ */
+void tile_decode_2bpp(uint8_t* output_buf, const uint16_t* input_vram);
 
 void translate_tile(uint32_t* output, uint8_t* input, size_t length, uint32_t bit_depth);

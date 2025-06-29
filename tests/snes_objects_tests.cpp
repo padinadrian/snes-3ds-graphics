@@ -10,4 +10,4 @@ TEST(SnesTest, ReadObjectFromOam1) {
     EXPECT_TRUE(true);
 }
 
-}
+}   // namespace
