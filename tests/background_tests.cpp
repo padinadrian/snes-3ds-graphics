@@ -172,4 +172,31 @@ TEST(TileTest, TileDecode2bpp)
     }
 }
 
+TEST(TileTest, TileEncodeDecode2bpp)
+{
+    // A single tile is 8x8 pixels
+    // 8 * 8 = 64 color IDs
+    const uint8_t tile_buffer[64] = {
+        0, 1, 2, 3, 0, 1, 2, 3,
+        1, 2, 3, 0, 1, 2, 3, 0,
+        2, 3, 0, 1, 2, 3, 0, 1,
+        3, 0, 1, 2, 3, 0, 1, 2,
+        3, 2, 1, 0, 3, 2, 1, 0,
+        2, 1, 0, 3, 2, 1, 0, 3,
+        1, 0, 3, 2, 1, 0, 3, 2,
+        0, 3, 2, 1, 0, 3, 2, 1,
+    };
+
+    // Encode tiles into VRAM
+    uint16_t vram[8] = {};
+    tile_encode_2bpp(vram, tile_buffer);
+
+    // Decode tiles from VRAM and check that results are the same
+    uint8_t temp_buffer[64] = {};
+    tile_decode_2bpp(temp_buffer, vram);
+    for (size_t i = 0; i < 64; ++i) {
+        EXPECT_EQ(tile_buffer[i], temp_buffer[i]);
+    }
+}
+
 }   // namespace
