@@ -172,6 +172,36 @@ TEST(TileTest, TileDecode2bpp)
     }
 }
 
+TEST(TileTest, TileDecode4bpp)
+{
+    // Input VRAM: 16 bytes (8 words) is one tile.
+    const uint16_t vram[16] = {
+        0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0,
+        0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33,
+    };
+
+    // A single tile is 8x8 pixels
+    // 8 * 8 = 64 color IDs
+    const uint8_t expected_tiles[64] = {
+        1, 3, 5, 7, 8, 10, 12, 14,
+        1, 3, 5, 7, 8, 10, 12, 14,
+        1, 3, 5, 7, 8, 10, 12, 14,
+        1, 3, 5, 7, 8, 10, 12, 14,
+        1, 3, 5, 7, 8, 10, 12, 14,
+        1, 3, 5, 7, 8, 10, 12, 14,
+        1, 3, 5, 7, 8, 10, 12, 14,
+        1, 3, 5, 7, 8, 10, 12, 14,
+    };
+
+    uint8_t tile_buffer[64] = {};
+
+    tile_decode_4bpp(tile_buffer, vram);
+
+    for (size_t i = 0; i < 64; ++i) {
+        EXPECT_EQ(tile_buffer[i], expected_tiles[i]);
+    }
+}
+
 TEST(TileTest, TileEncodeDecode2bpp)
 {
     // A single tile is 8x8 pixels

@@ -40,4 +40,20 @@ void tile_encode_8bpp(uint16_t* output_vram, const uint8_t* palette_ids);
  */
 void tile_decode_2bpp(uint8_t* output_buf, const uint16_t* input_vram);
 
+/**
+ * @brief Decode a single tile from a tile buffer in 4bpp format.
+ *
+ * @param output_buf Pointer to destination buffer of palette IDs
+ * @param input_vram Pointer to input buffer of tile data in VRAM
+ */
+void tile_decode_4bpp(uint8_t* output_buf, const uint16_t* input_vram);
+
+/**
+ * @brief Decode a single tile from a tile buffer in 8bpp format.
+ *
+ * @param output_buf Pointer to destination buffer of palette IDs
+ * @param input_vram Pointer to input buffer of tile data in VRAM
+ */
+void tile_decode_8bpp(uint8_t* output_buf, const uint16_t* input_vram);
+
 void translate_tile(uint32_t* output, uint8_t* input, size_t length, uint32_t bit_depth);

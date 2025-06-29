@@ -18,7 +18,8 @@
 void tile_encode_helper(
         uint16_t* output_vram,
         const uint8_t* palette_ids,
-        const uint16_t shift)
+        const int shift
+)
 {
     uint16_t upper = 0, lower = 0;
     for (size_t i = 0; i < 8; ++i, lower <<= 1, upper <<= 1) {
@@ -92,20 +93,30 @@ void tile_encode_8bpp(uint16_t* output_vram, const uint8_t* palette_ids)
  * @param input_vram Pointer to input buffer of tile data in VRAM
  * @param shift Amount to shift the palette ID down before reading the value
  */
-void tile_decode_helper(uint8_t* output_buf, const uint16_t* input_vram)
+void tile_decode_helper(
+        uint8_t* output_buf,
+        uint16_t input_vram,
+        const int shift
+)
 {
+    uint8_t temp_buf[8];
+
     // Lower byte is bit plane 0
-    uint16_t tile_data = *input_vram;
     for (size_t i = 0; i < 8; ++i) {
-        output_buf[i] = tile_data & 1;
-        tile_data >>= 1;
+        temp_buf[i] = (input_vram & 1) << shift;
+        input_vram >>= 1;
     }
     // Upper byte is bit plane 1
     for (size_t i = 0; i < 8; ++i) {
-        output_buf[i] |= (tile_data & 1) << 1;
-        tile_data >>= 1;
+        temp_buf[i] |= ((input_vram & 1) << (shift + 1));
+        input_vram >>= 1;
     }
-    reverse_bytes(output_buf, 8);
+
+    // Copy bytes to output buffer (use OR to preserve results of previous calls)
+    reverse_bytes(temp_buf, 8);
+    for (size_t i = 0; i < 8; i++) {
+        output_buf[i] |= temp_buf[i];
+    }
 }
 
 /**
@@ -116,8 +127,53 @@ void tile_decode_helper(uint8_t* output_buf, const uint16_t* input_vram)
  */
 void tile_decode_2bpp(uint8_t* output_buf, const uint16_t* input_vram)
 {
+    // One tile is 8 rows of 2 bytes each.
     for (size_t i = 0; i < 8; ++i) {
-        tile_decode_helper(output_buf + (i * 8), input_vram + i);
+        tile_decode_helper(output_buf + (i * 8), input_vram[i], 0);
+    }
+}
+
+/**
+ * @brief Decode a single tile from a tile buffer in 4bpp format.
+ *
+ * @param output_buf Pointer to destination buffer of palette IDs
+ * @param input_vram Pointer to input buffer of tile data in VRAM
+ */
+void tile_decode_4bpp(uint8_t* output_buf, const uint16_t* input_vram)
+{
+    // First 16 bytes are bit planes 0 and 1
+    for (size_t i = 0; i < 8; ++i) {
+        tile_decode_helper(output_buf + (i * 8), input_vram[i], 0);
+    }
+    // Second 16 bytes are bit planes 2 and 3
+    for (size_t i = 0; i < 8; ++i) {
+        tile_decode_helper(output_buf + (i * 8), input_vram[i + 8], 2);
+    }
+}
+
+/**
+ * @brief Decode a single tile from a tile buffer in 8bpp format.
+ *
+ * @param output_buf Pointer to destination buffer of palette IDs
+ * @param input_vram Pointer to input buffer of tile data in VRAM
+ */
+void tile_decode_8bpp(uint8_t* output_buf, const uint16_t* input_vram)
+{
+    // First 16 bytes are bit planes 0 and 1
+    for (size_t i = 0; i < 8; ++i) {
+        tile_decode_helper(output_buf + (i * 8), input_vram[i], 0);
+    }
+    // First 16 bytes are bit planes 2 and 3
+    for (size_t i = 8; i < 16; ++i) {
+        tile_decode_helper(output_buf + (i * 8), input_vram[i], 2);
+    }
+    // First 16 bytes are bit planes 4 and 5
+    for (size_t i = 16; i < 24; ++i) {
+        tile_decode_helper(output_buf + (i * 8), input_vram[i], 4);
+    }
+    // First 16 bytes are bit planes 6 and 7
+    for (size_t i = 24; i < 32; ++i) {
+        tile_decode_helper(output_buf + (i * 8), input_vram[i], 6);
     }
 }
 
