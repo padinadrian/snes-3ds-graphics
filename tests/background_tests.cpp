@@ -174,7 +174,7 @@ TEST(TileTest, TileDecode2bpp)
 
 TEST(TileTest, TileDecode4bpp)
 {
-    // Input VRAM: 16 bytes (8 words) is one tile.
+    // Input VRAM: 32 bytes (16 words) is one tile.
     const uint16_t vram[16] = {
         0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0,
         0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33,
@@ -202,11 +202,43 @@ TEST(TileTest, TileDecode4bpp)
     }
 }
 
+TEST(TileTest, TileDecode8bpp)
+{
+    // Input VRAM: 64 bytes (32 words) is one tile.
+    const uint16_t vram[32] = {
+        0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0, 0x55F0,
+        0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33, 0x0F33,
+        0xA50F, 0xA50F, 0xA50F, 0xA50F, 0xA50F, 0xA50F, 0xA50F, 0xA50F,
+        0x1F63, 0x1F63, 0x1F63, 0x1F63, 0x1F63, 0x1F63, 0x1F63, 0x1F63,
+    };
+
+    // A single tile is 8x8 pixels
+    // 8 * 8 = 64 color IDs
+    const uint8_t expected_tiles[64] = {
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+        0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 0xDC, 0xFE,
+    };
+
+    uint8_t tile_buffer[64] = {};
+
+    tile_decode_8bpp(tile_buffer, vram);
+
+    for (size_t i = 0; i < 64; ++i) {
+        EXPECT_EQ(tile_buffer[i], expected_tiles[i]);
+    }
+}
+
 TEST(TileTest, TileEncodeDecode2bpp)
 {
     // A single tile is 8x8 pixels
     // 8 * 8 = 64 color IDs
-    const uint8_t tile_buffer[64] = {
+    const uint8_t expected_tiles[64] = {
         0, 1, 2, 3, 0, 1, 2, 3,
         1, 2, 3, 0, 1, 2, 3, 0,
         2, 3, 0, 1, 2, 3, 0, 1,
@@ -219,13 +251,68 @@ TEST(TileTest, TileEncodeDecode2bpp)
 
     // Encode tiles into VRAM
     uint16_t vram[8] = {};
-    tile_encode_2bpp(vram, tile_buffer);
+    tile_encode_2bpp(vram, expected_tiles);
 
     // Decode tiles from VRAM and check that results are the same
-    uint8_t temp_buffer[64] = {};
-    tile_decode_2bpp(temp_buffer, vram);
+    uint8_t tile_buffer[64] = {};
+    tile_decode_2bpp(tile_buffer, vram);
     for (size_t i = 0; i < 64; ++i) {
-        EXPECT_EQ(tile_buffer[i], temp_buffer[i]);
+        EXPECT_EQ(expected_tiles[i], tile_buffer[i]);
+    }
+}
+
+TEST(TileTest, TileEncodeDecode4bpp)
+{
+    // A single tile is 8x8 pixels
+    // 8 * 8 = 64 color IDs
+    const uint8_t expected_tiles[64] = {
+        10, 7, 0, 6, 1, 6, 1, 7,
+        12, 4, 15, 13, 5, 11, 8, 3,
+        9, 12, 13, 9, 1, 1, 8, 4,
+        9, 13, 2, 3, 6, 7, 3, 5,
+        10, 0, 7, 8, 13, 4, 6, 13,
+        1, 12, 2, 1, 12, 3, 11, 10,
+        13, 11, 11, 15, 10, 8, 11, 8,
+        15, 0, 1, 9, 3, 8, 9, 13
+    };
+
+    // Encode tiles into VRAM
+    uint16_t vram[16] = {};
+    tile_encode_4bpp(vram, expected_tiles);
+
+    // Decode tiles from VRAM and check that results are the same
+    uint8_t tile_buffer[64] = {};
+    tile_decode_4bpp(tile_buffer, vram);
+
+    for (size_t i = 0; i < 64; ++i) {
+        EXPECT_EQ(expected_tiles[i], tile_buffer[i]);
+    }
+}
+
+TEST(TileTest, TileEncodeDecode8bpp)
+{
+    // A single tile is 8x8 pixels
+    // 8 * 8 = 64 color IDs
+    const uint8_t expected_tiles[64] = {
+        73, 117, 171, 49, 2, 130, 58, 177,
+        6, 187, 135, 63, 61, 147, 112, 152,
+        128, 116, 241, 201, 105, 13, 124, 52,
+        69, 175, 13, 228, 64, 1, 94, 140,
+        173, 45, 115, 26, 59, 87, 171, 108,
+        159, 128, 130, 211, 66, 68, 48, 24,
+        157, 90, 191, 9, 245, 97, 226, 132,
+        125, 109, 132, 170, 137, 50, 121, 160
+    };
+
+    // Encode tiles into VRAM
+    uint16_t vram[32] = {};
+    tile_encode_8bpp(vram, expected_tiles);
+
+    // Decode tiles from VRAM and check that results are the same
+    uint8_t tile_buffer[64] = {};
+    tile_decode_8bpp(tile_buffer, vram);
+    for (size_t i = 0; i < 64; ++i) {
+        EXPECT_EQ(expected_tiles[i], tile_buffer[i]);
     }
 }
 
