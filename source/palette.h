@@ -12,6 +12,8 @@ typedef struct {
     uint8_t green_h : 2;
     // Blue component of color
     uint8_t blue : 5;
+    // Unused
+    uint8_t _unused : 1;
 } PaletteColor;
 
 typedef struct {

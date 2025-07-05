@@ -23,4 +23,13 @@ TEST(PaletteTest, PaletteColorGetColor)
     EXPECT_EQ(palette_color_get_blue(color), 21);
 }
 
+TEST(PaletteTest, PaletteColorGetColor2)
+{
+    PaletteColor color;
+    *((uint16_t*)&color) = 0b0111001011000110;
+    EXPECT_EQ(palette_color_get_red(color), 6);
+    EXPECT_EQ(palette_color_get_green(color), 22);
+    EXPECT_EQ(palette_color_get_blue(color), 28);
+}
+
 }   // namespace
