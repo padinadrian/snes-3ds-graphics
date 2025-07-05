@@ -4,6 +4,7 @@
 add_executable(unittests
     ../source/background.c
     background_tests.cpp
+    palette_tests.cpp
     snes_objects_tests.cpp
     utility_tests.cpp
 )
