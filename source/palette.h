@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+enum { NUM_CGRAM_COLORS = 256 };
+
 typedef struct {
     // Red component of color
     uint8_t red : 5;
@@ -18,7 +20,7 @@ typedef struct {
 
 typedef struct {
     // List of colors in CGRAM
-    PaletteColor colors[256];
+    PaletteColor colors[NUM_CGRAM_COLORS];
 } CGRAM;
 
 /**
@@ -41,6 +43,3 @@ static inline uint8_t palette_color_get_green(PaletteColor color) {
 static inline uint8_t palette_color_get_blue(PaletteColor color) {
     return color.blue;
 }
-
-
-

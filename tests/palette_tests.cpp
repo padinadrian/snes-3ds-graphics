@@ -4,14 +4,11 @@ extern "C" {
     #include "palette.h"
 }
 
-
-#include <cstdio>
-
 namespace {
 
 TEST(PaletteTest, PaletteObjectSizes)
 {
-    EXPECT_EQ(sizeof(PaletteColor), 2);
+    ASSERT_EQ(sizeof(PaletteColor), 2);
 }
 
 TEST(PaletteTest, PaletteColorGetColor)
