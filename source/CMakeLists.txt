@@ -6,7 +6,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in" "${CMAKE_CURRENT_BIN
 # Create binary executable
 add_library(${PROJECT_NAME}
     background.c
-    snes.c
+    oam.c
     "${CMAKE_CURRENT_BINARY_DIR}/version.cpp"
 )
 

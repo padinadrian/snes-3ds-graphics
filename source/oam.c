@@ -1,6 +1,8 @@
+// oam.c
+
 #include <stdint.h>
 #include <string.h>
-#include "snes.h"
+#include "oam.h"
 
 
 /** Initialize OAM */

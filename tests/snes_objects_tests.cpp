@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "snes.h"
+#include "oam.h"
 
 namespace {
 

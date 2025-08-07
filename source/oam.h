@@ -1,4 +1,4 @@
-// snes.h
+// oam.h
 
 #ifndef TEST_3DS_SNES_H_
 #define TEST_3DS_SNES_H_
@@ -102,10 +102,10 @@ typedef struct Tile {
     uint8_t pixels[64];
 } Tile;
 
-/** Read a single object from OAM. */
-void read_object_from_oam(Object* object_ptr, ObjectAttributeMemory* oam, uint16_t index);
-
 /** Initialize OAM memory. */
 void init_oam(ObjectAttributeMemory* oam);
+
+/** Read a single object from OAM. */
+void read_object_from_oam(Object* object_ptr, ObjectAttributeMemory* oam, uint16_t index);
 
 #endif  // TEST_3DS_SNES_H_

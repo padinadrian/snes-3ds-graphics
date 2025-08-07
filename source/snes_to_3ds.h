@@ -6,7 +6,7 @@
 #include <3ds.h>
 #include <citro3d.h>
 #include <citro2d.h>
-#include "snes.h"
+#include "oam.h"
 
 void init_default_palette();
 void init_snes_sprites();

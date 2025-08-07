@@ -2,7 +2,7 @@
 #include <3ds.h>
 #include <citro3d.h>
 #include <citro2d.h>
-#include "snes.h"
+#include "oam.h"
 #include "snes_to_3ds.h"
 
 static C3D_Tex c3d_sprite_tex[SNES_MAX_OBJECTS];
