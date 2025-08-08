@@ -15,6 +15,9 @@
 /** Length of the OAM high table array. */
 #define SNES_OAM_HIGH_TABLE_LEN (SNES_MAX_OBJECTS >> 2)
 
+/** Complete size of OAM in bytes. */
+#define SNES_OAM_SIZE 544
+
 /**
  * Tilemap object; contains info on a single tile in a background.
  *

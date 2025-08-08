@@ -4,6 +4,7 @@
 #include <citro2d.h>
 #include "oam.h"
 #include "snes_to_3ds.h"
+#include "palette.h"
 
 static C3D_Tex c3d_sprite_tex[SNES_MAX_OBJECTS];
 static C2D_Sprite c2d_sprites[SNES_MAX_OBJECTS];
@@ -107,7 +108,7 @@ void snes_sprite_set_priority(ObjectAttributeMemory* oam, uint32_t sprite_id, ui
 }
 
 /** Update C2D sprites to reflect changes in the SNES objects. */
-void update_snes_sprites(ObjectAttributeMemory* oam, Tile* tileset) {
+void update_snes_sprites(ObjectAttributeMemory* oam, Tile* tileset, CGRAM* cgram) {
     Object snes_object;
     C2D_Sprite* sprite_ptr = c2d_sprites;
 
@@ -119,16 +120,22 @@ void update_snes_sprites(ObjectAttributeMemory* oam, Tile* tileset) {
             // this data every single time, and instead only update
             // sprites that have actually changed (dirty bit?)
 
-            // TODO: Use a standard palette for now
             // TODO: Assume texture is 8x8
             // TODO: Check sprite size
             uint32_t* pixel_buffer = (uint32_t*)sprite_ptr->image.tex->data;
             Tile* tile_ptr = &(tileset[snes_object.tile_id]);
+
+            // All sprites use 4bpp 16-color tiles. Each sprite selects one of
+            // 8 palettes from the last half of CGRAM.
+            uint8_t palette_start = (snes_object.palette_id + 8) * 16;
+            uint16_t* palette = (uint16_t*)&(cgram->colors[palette_start]);
+
             for (size_t i = 0; i < 64; ++i) {
                 // Rearrange tile into texture format
                 size_t color_id = tile_ptr->pixels[i];
                 size_t pixel_id = index_lookup[i];
-                pixel_buffer[pixel_id] = default_palette.colors[color_id];
+                // pixel_buffer[pixel_id] = 0xFF00FFFF;
+                pixel_buffer[pixel_id] = convert_palette_to_rgba(palette[color_id]);
             }
 
             // Set position
