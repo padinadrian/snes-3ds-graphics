@@ -58,6 +58,10 @@ void init_snes_sprites() {
     }
 
     // Draw every sprite at least once on the first frame
+    refresh_all_sprites();
+}
+
+void refresh_all_sprites() {
     memset(dirty_flags, true, SNES_MAX_OBJECTS);
 }
 

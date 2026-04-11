@@ -1,3 +1,4 @@
+//! Definitions and functions for updating CGRAM and color palettes.
 
 #pragma once
 
