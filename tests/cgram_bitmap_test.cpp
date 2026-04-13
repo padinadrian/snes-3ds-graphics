@@ -56,6 +56,7 @@ TEST(CgramBitmapTest, LozPalette)
 {
     CGRAM cgram;
     const size_t result = read_cgram(&cgram, "tests/loz_cgram.bin");
+    ASSERT_GT(result, 0);
     generate_palette_bitmap(&cgram, "tests/loz_cgram.bmp");
     EXPECT_TRUE(
         compare_files(

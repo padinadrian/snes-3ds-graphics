@@ -16,6 +16,10 @@ int main(int argc, char** argv)
     }
 
     CGRAM cgram;
-    read_cgram(&cgram, argv[1]);
+    const size_t result = read_cgram(&cgram, argv[1]);
+    if (result < 1)
+    {
+        printf("Read failed; file not found.\n");
+    }
     generate_palette_bitmap(&cgram, argv[2]);
 }

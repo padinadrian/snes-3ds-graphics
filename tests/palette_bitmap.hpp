@@ -17,8 +17,11 @@ extern "C" {
 inline size_t read_cgram(CGRAM* cgram, const char* cgram_file)
 {
     FILE* fp = fopen(cgram_file, "rb");
-    const size_t result = fread(cgram->colors, 2, NUM_CGRAM_COLORS, fp);
-    return result;
+    if (!fp)
+    {
+        return 0;
+    }
+    return fread(cgram->colors, 2, NUM_CGRAM_COLORS, fp);
 }
 
 /**
