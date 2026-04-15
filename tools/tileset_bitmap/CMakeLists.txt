@@ -1,8 +1,9 @@
 # CMake file for unit test executable
 
 # List unit test source files
-add_executable(palette_bitmap
-    palette_bitmap.cpp
+add_executable(tileset_bitmap
+    ${CMAKE_SOURCE_DIR}/source/background.c
+    tileset_bitmap.cpp
 )
 
 # Include headers in tests folder

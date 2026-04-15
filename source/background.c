@@ -136,8 +136,8 @@ void tile_decode_2bpp(uint8_t* output_buf, const uint16_t* input_vram)
 /**
  * @brief Decode a single tile from a tile buffer in 4bpp format.
  *
- * @param output_buf Pointer to destination buffer of palette IDs
- * @param input_vram Pointer to input buffer of tile data in VRAM
+ * @param output_buf Pointer to destination buffer of palette IDs (size 64)
+ * @param input_vram Pointer to input buffer of tile data in VRAM (size 16)
  */
 void tile_decode_4bpp(uint8_t* output_buf, const uint16_t* input_vram)
 {
