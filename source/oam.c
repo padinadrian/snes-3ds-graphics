@@ -7,15 +7,20 @@
 
 /** Initialize OAM */
 
-void init_oam(ObjectAttributeMemory* oam) {
+void init_oam(ObjectAttributeMemory* oam)
+{
     // Set all X position MSB to hide all objects by default
     memset(oam->high_table, 0x55, SNES_OAM_HIGH_TABLE_LEN);
 }
 
 /** Read a single object from OAM. */
-void read_object_from_oam(Object* object_ptr, ObjectAttributeMemory* oam, uint16_t index) {
-
-    ObjectAttributesLower* low_attrs = oam->low_table + index;
+void read_object_from_oam(
+        Object* object_ptr,
+        const ObjectAttributeMemory* oam,
+        const uint16_t index
+)
+{
+    const ObjectAttributesLower* low_attrs = oam->low_table + index;
 
     // Fetch attribute bits from high table
     size_t high_attr_index = index >> 2;
@@ -36,12 +41,7 @@ void read_object_from_oam(Object* object_ptr, ObjectAttributeMemory* oam, uint16
     object_ptr->h_flip = low_attrs->h_flip;
     object_ptr->priority = low_attrs->priority;
     object_ptr->palette_id = low_attrs->palette_id;
-
-    uint16_t tile_id = low_attrs->tile_id;
-    tile_id |= ((uint16_t)high_attrs >> 1) << 8;
-    object_ptr->tile_id = tile_id;
-
-    tile_id |= ((uint16_t)high_attrs >> 1) << 8;
-    object_ptr->tile_id = tile_id;
+    object_ptr->tile_id = low_attrs->tile_id;
+    object_ptr->tile_page = low_attrs->tile_page;
 }
 

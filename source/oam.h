@@ -35,7 +35,8 @@ typedef struct Tilemap {
  * Size: 34 bits
  */
 typedef struct Object {
-    uint16_t tile_id : 9;
+    uint8_t tile_id : 8;
+    uint8_t tile_page : 1;
     uint16_t x_pos : 9;
     uint8_t y_pos : 8;
     uint8_t v_flip : 1;
@@ -56,16 +57,16 @@ typedef struct ObjectAttributesLower {
     uint8_t y_pos : 8;
     // Lower 8 bits of the tile ID
     uint8_t tile_id : 8;
-    // Vertical flip
-    uint8_t v_flip : 1;
-    // Horizontal flip
-    uint8_t h_flip : 1;
-    // Priority (0-3)
-    uint8_t priority : 2;
-    // Color palette ID
-    uint8_t palette_id : 3;
     // MSB of the tile ID (also known as tile page)
     uint8_t tile_page: 1;
+    // Color palette ID
+    uint8_t palette_id : 3;
+    // Priority (0-3)
+    uint8_t priority : 2;
+    // Horizontal flip
+    uint8_t h_flip : 1;
+    // Vertical flip
+    uint8_t v_flip : 1;
 } ObjectAttributesLower;
 
 /**
@@ -109,6 +110,10 @@ typedef struct Tile {
 void init_oam(ObjectAttributeMemory* oam);
 
 /** Read a single object from OAM. */
-void read_object_from_oam(Object* object_ptr, ObjectAttributeMemory* oam, uint16_t index);
+void read_object_from_oam(
+        Object* object_ptr,
+        const ObjectAttributeMemory* oam,
+        const uint16_t index
+);
 
 #endif  // TEST_3DS_SNES_H_

@@ -5,6 +5,7 @@
 #include "oam.h"
 #include "snes_to_3ds.h"
 #include "palette.h"
+#include "background.h"
 
 static C3D_Tex c3d_sprite_tex[SNES_MAX_OBJECTS];
 static C2D_Sprite c2d_sprites[SNES_MAX_OBJECTS];
@@ -30,7 +31,8 @@ const size_t index_lookup[64] = {
 static bool dirty_flags[SNES_MAX_OBJECTS] = {};
 
 
-void init_default_palette() {
+void init_default_palette()
+{
     default_palette.colors[0] = 0x00000000; // black
     default_palette.colors[1] = 0xFF0000FF; // red
     default_palette.colors[2] = 0x00FF00FF; // green
@@ -41,8 +43,10 @@ void init_default_palette() {
     default_palette.colors[7] = 0xFFFFFFFF; // white
 }
 
-void init_snes_sprites() {
-    for (size_t i = 0; i < SNES_MAX_OBJECTS; ++i) {
+void init_snes_sprites()
+{
+    for (size_t i = 0; i < SNES_MAX_OBJECTS; ++i)
+    {
         // Init texture
         C3D_Tex* texture_ptr = &(c3d_sprite_tex[i]);
         C3D_TexInitVRAM(c3d_sprite_tex + i, 8, 8, GPU_RGBA8);
@@ -61,12 +65,18 @@ void init_snes_sprites() {
     refresh_all_sprites();
 }
 
-void refresh_all_sprites() {
+void refresh_all_sprites()
+{
     memset(dirty_flags, true, SNES_MAX_OBJECTS);
 }
 
 /** Set the sprite tile. */
-void snes_set_sprite_tile(ObjectAttributeMemory* oam, uint32_t sprite_id, uint16_t tile_id) {
+void snes_set_sprite_tile(
+        ObjectAttributeMemory* oam,
+        uint32_t sprite_id,
+        uint16_t tile_id
+)
+{
     oam->low_table[sprite_id].tile_id = tile_id;
     dirty_flags[sprite_id] = true;
 }
@@ -75,7 +85,9 @@ void snes_set_sprite_tile(ObjectAttributeMemory* oam, uint32_t sprite_id, uint16
 void snes_update_sprite_pos(
         ObjectAttributeMemory* oam,
         uint32_t sprite_id,
-        uint16_t x_pos, uint16_t y_pos) {
+        uint16_t x_pos, uint16_t y_pos
+)
+{
     // X position high bit
     uint32_t high_attr_index = sprite_id >> 2;
     uint8_t offset = (sprite_id & 3) << 1;  // 0, 2, 4, or 6
@@ -94,30 +106,91 @@ void snes_update_sprite_pos(
 }
 
 /** Set horizontal flip on or off. */
-void snes_sprite_set_h_flip(ObjectAttributeMemory* oam, uint32_t sprite_id, bool flip) {
+void snes_sprite_set_h_flip(
+        ObjectAttributeMemory* oam,
+        uint32_t sprite_id,
+        bool flip
+)
+{
     oam->low_table[sprite_id].h_flip = flip;
     dirty_flags[sprite_id] = true;
 }
 
 /** Set vertical flip on or off. */
-void snes_sprite_set_v_flip(ObjectAttributeMemory* oam, uint32_t sprite_id, bool flip) {
+void snes_sprite_set_v_flip(
+        ObjectAttributeMemory* oam,
+        uint32_t sprite_id,
+        bool flip
+)
+{
     oam->low_table[sprite_id].v_flip = flip;
     dirty_flags[sprite_id] = true;
 }
 
 /** Set vertical flip on or off. */
-void snes_sprite_set_priority(ObjectAttributeMemory* oam, uint32_t sprite_id, uint8_t priority) {
+void snes_sprite_set_priority(
+        ObjectAttributeMemory* oam,
+        uint32_t sprite_id,
+        uint8_t priority
+)
+{
     oam->low_table[sprite_id].priority = (priority & 3); // lower 2 bits only
     dirty_flags[sprite_id] = true;
 }
 
+/**
+ * @brief Helper function to decode a SNES tile/color into a 3DS texture.
+ *
+ * @param[out] pixel_buffer Output buffer to write the raw pixel values
+ * @param[in] vram_ptr Pointer to vram with the tile data
+ * @param[in] palette Pointer to start of palette to use to color the tile
+ */
+void decode_tile_to_texture(
+        uint32_t* pixel_buffer,
+        const uint16_t* vram_ptr,
+        const PaletteColor* palette // Start of palette (8 colors)
+)
+{
+    // Each pixel is a 4-bit index (0-15).
+    Tile tile = {};
+    tile_decode_4bpp(tile.pixels, vram_ptr);
+
+    // All sprites use 4bpp 16-color tiles. Each sprite selects one of
+    // 8 palettes from the last half of CGRAM.
+    uint16_t* palette_u16 = (uint16_t*)(palette);   // Array of 16 colors
+
+    // Assume texture is 8x8 = 64 pixels.
+    // Weird decoding pattern...
+    for (size_t i = 0; i < 64; i += 1)
+    {
+        const uint8_t color_id = tile.pixels[i];
+        const size_t pixel_id = index_lookup[i];
+        if (color_id == 0)
+        {
+            pixel_buffer[pixel_id] = 0;
+        }
+        else
+        {
+            const uint16_t color = palette_u16[color_id];
+            pixel_buffer[pixel_id] = convert_palette_to_rgba(color);
+        }
+    }
+}
+
 /** Update C2D sprites to reflect changes in the SNES objects. */
-void update_snes_sprites(ObjectAttributeMemory* oam, Tile* tileset, CGRAM* cgram) {
+void update_snes_sprites(
+        ObjectAttributeMemory* oam,
+        const uint16_t* vram_ptr,
+        const CGRAM* cgram
+)
+{
     Object snes_object;
     C2D_Sprite* sprite_ptr = c2d_sprites;
 
-    for (size_t i = 0; i < SNES_MAX_OBJECTS; ++i) {
-        if (dirty_flags[i]) {
+    for (size_t i = 0; i < SNES_MAX_OBJECTS; ++i)
+    {
+        if (dirty_flags[i])
+        {
             read_object_from_oam(&snes_object, oam, i);
 
             // TODO: Would be nice to have a way to not copy all of
@@ -127,35 +200,42 @@ void update_snes_sprites(ObjectAttributeMemory* oam, Tile* tileset, CGRAM* cgram
             // TODO: Assume texture is 8x8
             // TODO: Check sprite size
             uint32_t* pixel_buffer = (uint32_t*)sprite_ptr->image.tex->data;
-            Tile* tile_ptr = &(tileset[snes_object.tile_id]);
 
             // All sprites use 4bpp 16-color tiles. Each sprite selects one of
             // 8 palettes from the last half of CGRAM.
-            uint8_t palette_start = (snes_object.palette_id + 8) * 16;
-            uint16_t* palette = (uint16_t*)&(cgram->colors[palette_start]);
+            const uint8_t palette_start = (snes_object.palette_id + 8) * 16;
 
-            for (size_t i = 0; i < 64; ++i) {
-                // Rearrange tile into texture format
-                size_t color_id = tile_ptr->pixels[i];
-                size_t pixel_id = index_lookup[i];
-                // pixel_buffer[pixel_id] = 0xFF00FFFF;
-                pixel_buffer[pixel_id] = convert_palette_to_rgba(palette[color_id]);
-            }
+            // Tiles are spaced 32 bytes apart in memory
+            // However, vram is uint16_t so divide by 2 bytes
+            uint32_t tile_id_offset = snes_object.tile_id * 16;
+
+            // Tile page offset
+            // TODO: The actual page offset should come from OBJSEL.
+            // TODO: For now we assume pages are contiguous (next page is 1)
+            tile_id_offset += snes_object.tile_page * 0x1000;
+
+            decode_tile_to_texture(
+                pixel_buffer,
+                &vram_ptr[tile_id_offset],
+                &(cgram->colors[palette_start])
+            );
 
             // Set position
             C2D_SpriteSetPos(sprite_ptr, snes_object.x_pos, snes_object.y_pos);
 
             // Set scale (flip x/y)
-            float x_scale = snes_object.h_flip ? -1.f : 1.f;
-            float y_scale = snes_object.v_flip ? -1.f : 1.f;
+            const float x_scale = snes_object.h_flip ? -1.f : 1.f;
+            const float y_scale = snes_object.v_flip ? -1.f : 1.f;
             C2D_SpriteSetScale(sprite_ptr, x_scale, y_scale);
 
             // Set depth: priority can be 0-3, scale to range 0.f-1.f
-            float depth = snes_object.priority / 3.f;
+            const float depth = snes_object.priority / 3.f;
             C2D_SpriteSetDepth(sprite_ptr, depth);
 
-            if (i == 0)
+            if (i == 1)
+            {
                 printf("\x1b[11;1H sprite:  %d, depth: %6.2f\x1b[K", i, depth);
+            }
 
             sprite_ptr++;
         }
@@ -163,13 +243,18 @@ void update_snes_sprites(ObjectAttributeMemory* oam, Tile* tileset, CGRAM* cgram
     memset(dirty_flags, false, SNES_MAX_OBJECTS);
 }
 
-void draw_snes_sprites() {
+void draw_snes_sprites()
+{
+    enum { MAX_DISPLAY_X_POS = 256 };
+
     for (
         C2D_Sprite* sprite_ptr = c2d_sprites;
         sprite_ptr < (c2d_sprites + SNES_MAX_OBJECTS);
         sprite_ptr++
-    ) {
-        if (sprite_ptr->params.pos.x < 256) {
+    )
+    {
+        if (sprite_ptr->params.pos.x < MAX_DISPLAY_X_POS)
+        {
             C2D_DrawSprite(sprite_ptr);
         }
     }
