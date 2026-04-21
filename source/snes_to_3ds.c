@@ -13,7 +13,7 @@ static C2D_Sprite c2d_sprites[SNES_MAX_OBJECTS];
 static Palette default_palette;
 
 const Tex3DS_SubTexture subtex_sprite = {
-    8, 8,     // width, height
+    16, 16,       // width, height
     0.0f, 1.0f, 1.0f, 0.0f  // left, top, right, bottom (??)
 };
 
@@ -49,7 +49,7 @@ void init_snes_sprites()
     {
         // Init texture
         C3D_Tex* texture_ptr = &(c3d_sprite_tex[i]);
-        C3D_TexInitVRAM(c3d_sprite_tex + i, 8, 8, GPU_RGBA8);
+        C3D_TexInitVRAM(texture_ptr, 16, 16, GPU_RGBA8);
         C2D_Image img_sprite = {texture_ptr, &subtex_sprite};
 
         // Create sprite from texture
@@ -220,6 +220,27 @@ void update_snes_sprites(
                 &(cgram->colors[palette_start])
             );
 
+            // TODO: The actual sprite size is controlled by OBJSEL
+            // TODO: For now assume size bit set means 16x16
+            if (snes_object.obj_size)
+            {
+                decode_tile_to_texture(
+                    pixel_buffer + 64,
+                    &vram_ptr[tile_id_offset + 0x10],
+                    &(cgram->colors[palette_start])
+                );
+                decode_tile_to_texture(
+                    pixel_buffer + (2 * 64),
+                    &vram_ptr[tile_id_offset + 0x100],
+                    &(cgram->colors[palette_start])
+                );
+                decode_tile_to_texture(
+                    pixel_buffer + (3 * 64),
+                    &vram_ptr[tile_id_offset + 0x110],
+                    &(cgram->colors[palette_start])
+                );
+            }
+
             // Set position
             C2D_SpriteSetPos(sprite_ptr, snes_object.x_pos, snes_object.y_pos);
 
@@ -228,11 +249,19 @@ void update_snes_sprites(
             const float y_scale = snes_object.v_flip ? -1.f : 1.f;
             C2D_SpriteSetScale(sprite_ptr, x_scale, y_scale);
 
+            // Priority can be 0-3. This determines depth relative to background.
+            // Sprite index also decides depth relative to other sprites.
+            // Higher sprite IDs are lower priority, 0-255
+            // Total range: 0x000 - 0x3FF
             // Set depth: priority can be 0-3, scale to range 0.f-1.f
-            const float depth = snes_object.priority / 3.f;
+            // Sprite index also determines depth, 0-255
+            // const float bg_depth = snes_object.priority / 3.f;
+            // const float spr_depth = i / 1000.f;
+            const uint32_t spr_depth = 0xff - i;
+            const float depth = (((uint32_t)(snes_object.priority) << 8) | spr_depth) / 1023.f;
             C2D_SpriteSetDepth(sprite_ptr, depth);
 
-            if (i == 1)
+            if (i == 0)
             {
                 printf("\x1b[11;1H sprite:  %d, depth: %6.2f\x1b[K", i, depth);
             }

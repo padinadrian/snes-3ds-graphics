@@ -45,12 +45,12 @@ int main(int argc, const char* argv[])
     }
 
     Object snes_object{};
-    for (size_t i = 0; i < SNES_MAX_OBJECTS; ++i)
+    for (uint32_t i = 0; i < SNES_MAX_OBJECTS; ++i)
     {
         read_object_from_oam(&snes_object, &oam, i);
         const uint32_t tile = 0x8000 + (snes_object.tile_id * 0x20);
         printf(
-            "i: %ld, tile: %04x, page: %d, x: %d, y: %d, v: %d, h: %d, prio: %d, pal: %d, size: %d\n",
+            "i: %02x, tile: %04x, page: %d, x: %d, y: %d, v: %d, h: %d, prio: %d, pal: %d, size: %d\n",
             i,
             tile,
             snes_object.tile_page,
