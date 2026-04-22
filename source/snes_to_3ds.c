@@ -5,7 +5,7 @@
 #include "oam.h"
 #include "snes_to_3ds.h"
 #include "palette.h"
-#include "background.h"
+#include "tile.h"
 
 static C3D_Tex c3d_sprite_tex[SNES_MAX_OBJECTS];
 static C2D_Sprite c2d_sprites[SNES_MAX_OBJECTS];
@@ -212,12 +212,17 @@ void update_snes_sprites(
 
             // Tiles are spaced 32 bytes apart in memory
             // However, vram is uint16_t so divide by 2 bytes
-            uint32_t tile_id_offset = snes_object.tile_id * 16;
+            uint32_t tile_id_offset = snes_object.tile_id << 4;
 
             // Tile page offset
             // TODO: The actual page offset should come from OBJSEL.
             // TODO: For now we assume pages are contiguous (next page is 1)
-            tile_id_offset += snes_object.tile_page * 0x1000;
+            tile_id_offset += (snes_object.tile_page << 12);
+
+            // if ((SNES_MAX_OBJECTS - i) == 0)
+            // {
+            //     tile_id_offset = 0x420;
+            // }
 
             decode_tile_to_texture(
                 pixel_buffer,

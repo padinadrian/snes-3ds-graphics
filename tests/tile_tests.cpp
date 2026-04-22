@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-    #include "background.h"
+    #include "tile.h"
 }
 
 namespace {
