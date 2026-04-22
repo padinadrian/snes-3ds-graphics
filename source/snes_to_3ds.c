@@ -92,10 +92,12 @@ void snes_update_sprite_pos(
     uint32_t high_attr_index = sprite_id >> 2;
     uint8_t offset = (sprite_id & 3) << 1;  // 0, 2, 4, or 6
     uint8_t x_pos_msb = 1 << offset;
-    if (x_pos > 0xFF) {
+    if (x_pos > 0xFF)
+    {
         oam->high_table[high_attr_index] |= x_pos_msb;
     }
-    else {
+    else
+    {
         oam->high_table[high_attr_index] &= ~x_pos_msb;
     }
 
@@ -191,7 +193,10 @@ void update_snes_sprites(
     {
         if (dirty_flags[i])
         {
-            read_object_from_oam(&snes_object, oam, i);
+            // Update objects in reverse order
+            // This ensures that the lowest objects are drawn last
+            // This should draw them on top
+            read_object_from_oam(&snes_object, oam, SNES_MAX_OBJECTS - i);
 
             // TODO: Would be nice to have a way to not copy all of
             // this data every single time, and instead only update
@@ -250,21 +255,9 @@ void update_snes_sprites(
             C2D_SpriteSetScale(sprite_ptr, x_scale, y_scale);
 
             // Priority can be 0-3. This determines depth relative to background.
-            // Sprite index also decides depth relative to other sprites.
-            // Higher sprite IDs are lower priority, 0-255
-            // Total range: 0x000 - 0x3FF
-            // Set depth: priority can be 0-3, scale to range 0.f-1.f
-            // Sprite index also determines depth, 0-255
-            // const float bg_depth = snes_object.priority / 3.f;
-            // const float spr_depth = i / 1000.f;
-            const uint32_t spr_depth = 0xff - i;
-            const float depth = (((uint32_t)(snes_object.priority) << 8) | spr_depth) / 1023.f;
+            // Do not worry about sprite depth relative to each other.
+            const float depth = (float)(snes_object.priority) / 4.0f;
             C2D_SpriteSetDepth(sprite_ptr, depth);
-
-            if (i == 0)
-            {
-                printf("\x1b[11;1H sprite:  %d, depth: %6.2f\x1b[K", i, depth);
-            }
 
             sprite_ptr++;
         }
