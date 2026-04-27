@@ -1,6 +1,9 @@
+/**
+ * Define PPU registers.
+ */
 
-
-#pragma once
+#ifndef SNES_3DS_PPU_H_
+#define SNES_3DS_PPU_H_
 
 
 /**
@@ -33,4 +36,7 @@ typedef enum {
     VMADDH  = 0x2117,   // VRAM word address upper byte
     VMDATAL = 0x2118,   // VRAM data write. Increments VMADD after write according to VMAIN setting
     VMDATAH = 0x2119,   //
-} MmemoryMapRegister;
+} MemoryMapRegister;
+
+
+#endif  // SNES_3DS_PPU_H_

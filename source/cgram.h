@@ -1,19 +1,21 @@
-/// Read and write to CGRAM
+/**
+ * Read and write to CGRAM.
+ *
+ * Not currently used -- TODO
+ */
 
-#pragma once
+#ifndef SNES_3DS_CGRAM_H_
+#define SNES_3DS_CGRAM_H_
+
+
+/* ===== Includes ===== */
 
 #include "palette.h"
 #include "stddef.h"
 #include "stdint.h"
 
-// Static pointer to CGRAM
-static CGRAM* g_cgram = NULL;
 
-// Static value of CGADD
-static uint8_t g_cgadd = 0;
-
-// Keeps track of the state of the CGRAM write (high or low byte)
-static unsigned int g_write_offset = 0;
+/* ===== Functions ===== */
 
 /**
  * @brief Initialize CGRAM
@@ -29,3 +31,6 @@ void set_cgadd(uint8_t cgadd_in);
  * @brief Write to CGRAM
  */
 void cgram_write(uint16_t val);
+
+
+#endif  // SNES_3DS_CGRAM_H_

@@ -2,7 +2,7 @@
 
 # List unit test source files
 add_executable(tileset_bitmap
-    ${CMAKE_SOURCE_DIR}/source/background.c
+    ${CMAKE_SOURCE_DIR}/source/tile.c
     tileset_bitmap.cpp
 )
 

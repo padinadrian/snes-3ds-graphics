@@ -1,10 +1,17 @@
-// oam.h
+/**
+ * Object attribute memory.
+ */
 
-#ifndef TEST_3DS_SNES_H_
-#define TEST_3DS_SNES_H_
+#ifndef SNES_3DS_OAM_H_
+#define SNES_3DS_OAM_H_
 
+
+/* ===== Includes ===== */
 
 #include <stdint.h>
+
+
+/* ===== Data ===== */
 
 /** Max number of objects that can be stored in OAM. */
 #define SNES_MAX_OBJECTS 128
@@ -18,18 +25,8 @@
 /** Complete size of OAM in bytes. */
 #define SNES_OAM_SIZE 544
 
-/**
- * Tilemap object; contains info on a single tile in a background.
- *
- * Size: 16 bits (2 bytes)
- */
-typedef struct Tilemap {
-    uint8_t v_flip : 1;
-    uint8_t h_flip : 1;
-    uint8_t priority : 1;
-    uint8_t palette_id : 3;
-    uint16_t tile_id : 10;
-} Tilemap;
+
+/* ===== Structs ===== */
 
 /**
  * Size: 34 bits
@@ -48,7 +45,7 @@ typedef struct Object {
 
 /**
  * Objects in OAM are split into two tables; This object stores the data in the
- * upper table.
+ * lower table.
  */
 typedef struct ObjectAttributesLower {
     // Lower 8 bits of the object X position
@@ -70,7 +67,7 @@ typedef struct ObjectAttributesLower {
 } ObjectAttributesLower;
 
 /**
- * Stores the object attributes stored in Table 2.
+ * Stores the object attributes stored in the upper table.
  */
 typedef struct ObjectAttributesUpper {
     // MSB of X position
@@ -80,9 +77,9 @@ typedef struct ObjectAttributesUpper {
 } ObjectAttributesUpper;
 
 /**
- *
+ * Object containing both upper and lower tables of OAM.
  */
-typedef struct ObjectAttributeMemory {
+ typedef struct ObjectAttributeMemory {
     // Object attributes lower table
     ObjectAttributesLower low_table[SNES_OAM_LOW_TABLE_LEN];
     // Object attributes upper table
@@ -90,30 +87,20 @@ typedef struct ObjectAttributeMemory {
 } ObjectAttributeMemory;
 
 
-/**
- * TODO: I HAVE NO IDEA IF THIS IS THE CORRECT STRUCTURE
- */
-typedef struct Palette {
-    uint32_t colors[8];
-} Palette;
-
+/* ===== Functions ===== */
 
 /**
- * TODO: I HAVE NO IDEA IF THIS IS THE CORRECT STRUCTURE
+ * @brief Initialize OAM memory.
  */
-typedef struct Tile {
-    /// 8x8 tile = 64 pixels
-    uint8_t pixels[64];
-} Tile;
-
-/** Initialize OAM memory. */
 void init_oam(ObjectAttributeMemory* oam);
 
-/** Read a single object from OAM. */
+/**
+ * @brief Read a single object from OAM.
+ */
 void read_object_from_oam(
-        Object* object_ptr,
-        const ObjectAttributeMemory* oam,
-        const uint16_t index
+    Object* object_ptr,
+    const ObjectAttributeMemory* oam,
+    const uint16_t index
 );
 
-#endif  // TEST_3DS_SNES_H_
+#endif  // SNES_3DS_OAM_H_

@@ -9,11 +9,12 @@ namespace {
 TEST(PaletteTest, PaletteObjectSizes)
 {
     ASSERT_EQ(sizeof(PaletteColor), 2);
+    ASSERT_EQ(sizeof(PaletteColorBits), 2);
 }
 
 TEST(PaletteTest, PaletteColorGetColor)
 {
-    PaletteColor color;
+    PaletteColorBits color;
     *((uint16_t*)&color) = 0x5555;
     EXPECT_EQ(palette_color_get_red(color), 21);
     EXPECT_EQ(palette_color_get_green(color), 10);
@@ -22,7 +23,7 @@ TEST(PaletteTest, PaletteColorGetColor)
 
 TEST(PaletteTest, PaletteColorGetColor2)
 {
-    PaletteColor color;
+    PaletteColorBits color;
     *((uint16_t*)&color) = 0b0111001011000110;
     EXPECT_EQ(palette_color_get_red(color), 6);
     EXPECT_EQ(palette_color_get_green(color), 22);

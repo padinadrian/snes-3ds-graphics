@@ -52,7 +52,7 @@ TEST(TileTest, TileEncode2bpp)
     // 16 bytes defines 1 tile
     uint16_t vram[8] = {};
 
-    tile_encode_2bpp(vram, tile_buffer);
+    tile_encode_2bpp(vram, (Tile*)tile_buffer);
     for (size_t i = 0; i < 8; ++i) {
         EXPECT_EQ(vram[i], 0x551D);
     }
@@ -87,7 +87,7 @@ TEST(TileTest, TileEncode4bpp) {
     // Bits 2: 0 0 1 1 0 0 1 1 = 0x33
     // Bits 3: 0 0 0 0 1 1 1 1 = 0x0F
 
-    tile_encode_4bpp(vram, tile_buffer);
+    tile_encode_4bpp(vram, (Tile*)tile_buffer);
     for (size_t i = 0; i < 8; ++i) {
         EXPECT_EQ(vram[i], 0x55F0);
     }
@@ -129,7 +129,7 @@ TEST(TileTest, TileEncode8bpp) {
     // Bits 6: 01100011 = 0x63
     // Bits 7: 00011111 = 0x1F
 
-    tile_encode_8bpp(vram, tile_buffer);
+    tile_encode_8bpp(vram, (Tile*)tile_buffer);
     for (size_t i = 0; i < 8; ++i) {
         EXPECT_EQ(vram[i], 0x55F0);
     }
@@ -166,7 +166,7 @@ TEST(TileTest, TileDecode2bpp)
 
     uint8_t tile_buffer[64] = {};
 
-    tile_decode_2bpp(tile_buffer, vram);
+    tile_decode_2bpp((Tile*)tile_buffer, vram);
     for (size_t i = 0; i < 64; ++i) {
         EXPECT_EQ(tile_buffer[i], expected_tiles[i]);
     }
@@ -195,7 +195,7 @@ TEST(TileTest, TileDecode4bpp)
 
     uint8_t tile_buffer[64] = {};
 
-    tile_decode_4bpp(tile_buffer, vram);
+    tile_decode_4bpp((Tile*)tile_buffer, vram);
 
     for (size_t i = 0; i < 64; ++i) {
         EXPECT_EQ(tile_buffer[i], expected_tiles[i]);
@@ -227,7 +227,7 @@ TEST(TileTest, TileDecode8bpp)
 
     uint8_t tile_buffer[64] = {};
 
-    tile_decode_8bpp(tile_buffer, vram);
+    tile_decode_8bpp((Tile*)tile_buffer, vram);
 
     for (size_t i = 0; i < 64; ++i) {
         EXPECT_EQ(tile_buffer[i], expected_tiles[i]);
@@ -251,11 +251,11 @@ TEST(TileTest, TileEncodeDecode2bpp)
 
     // Encode tiles into VRAM
     uint16_t vram[8] = {};
-    tile_encode_2bpp(vram, expected_tiles);
+    tile_encode_2bpp(vram, (Tile*)expected_tiles);
 
     // Decode tiles from VRAM and check that results are the same
     uint8_t tile_buffer[64] = {};
-    tile_decode_2bpp(tile_buffer, vram);
+    tile_decode_2bpp((Tile*)tile_buffer, vram);
     for (size_t i = 0; i < 64; ++i) {
         EXPECT_EQ(expected_tiles[i], tile_buffer[i]);
     }
@@ -278,11 +278,11 @@ TEST(TileTest, TileEncodeDecode4bpp)
 
     // Encode tiles into VRAM
     uint16_t vram[16] = {};
-    tile_encode_4bpp(vram, expected_tiles);
+    tile_encode_4bpp(vram, (Tile*)expected_tiles);
 
     // Decode tiles from VRAM and check that results are the same
     uint8_t tile_buffer[64] = {};
-    tile_decode_4bpp(tile_buffer, vram);
+    tile_decode_4bpp((Tile*)tile_buffer, vram);
 
     for (size_t i = 0; i < 64; ++i) {
         EXPECT_EQ(expected_tiles[i], tile_buffer[i]);
@@ -306,13 +306,14 @@ TEST(TileTest, TileEncodeDecode8bpp)
 
     // Encode tiles into VRAM
     uint16_t vram[32] = {};
-    tile_encode_8bpp(vram, expected_tiles);
+    tile_encode_8bpp(vram, (Tile*)expected_tiles);
 
     // Decode tiles from VRAM and check that results are the same
-    uint8_t tile_buffer[64] = {};
-    tile_decode_8bpp(tile_buffer, vram);
-    for (size_t i = 0; i < 64; ++i) {
-        EXPECT_EQ(expected_tiles[i], tile_buffer[i]);
+    Tile tile = {};
+    tile_decode_8bpp(&tile, vram);
+    for (size_t i = 0; i < 64; ++i)
+    {
+        EXPECT_EQ(expected_tiles[i], tile.pixels[i]);
     }
 }
 

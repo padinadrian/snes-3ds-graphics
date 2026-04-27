@@ -25,9 +25,11 @@ TEST(CgramTest, CgramWrite)
     cgram_write(0x55);
     cgram_write(0x66);
 
-    EXPECT_EQ(*(uint16_t*)&cgram.colors[127], 0x2211);
-    EXPECT_EQ(*(uint16_t*)&cgram.colors[128], 0x4433);
-    EXPECT_EQ(*(uint16_t*)&cgram.colors[129], 0x6655);
+    const uint16_t* colors_ptr = cgram.palettes[0].colors;
+
+    EXPECT_EQ(colors_ptr[127], 0x2211);
+    EXPECT_EQ(colors_ptr[128], 0x4433);
+    EXPECT_EQ(colors_ptr[129], 0x6655);
 }
 
 }   // namespace

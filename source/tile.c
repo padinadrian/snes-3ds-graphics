@@ -1,10 +1,17 @@
-//! Functions for encoding and decoding tiles in VRAM.
+/**
+ * Functions for encoding and decoding tiles in VRAM.
+ */
 
 /* ========== Includes ========== */
+
+#include "tile.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
 #include "utility.h"
+
 
 /* ========== Functions ========== */
 
@@ -15,8 +22,8 @@
  * @param input_buf Pointer to input buffer of palette IDs
  * @param shift Amount to shift the palette ID down before reading the value
  */
-void tile_encode_helper(
-        uint16_t* output_vram,
+static inline void tile_encode_helper(
+        EncodedTile* output_vram,
         const uint8_t* palette_ids,
         const int shift
 )
@@ -35,8 +42,10 @@ void tile_encode_helper(
  * @param output_vram Pointer to destination buffer in VRAM
  * @param input_buf Pointer to input buffer of palette IDs
  */
-void tile_encode_2bpp(uint16_t* output_vram, const uint8_t* palette_ids)
+void tile_encode_2bpp(EncodedTile* output_vram, const Tile* tile)
 {
+    const uint8_t* palette_ids = tile->pixels;
+
     for (size_t i = 0; i < 8; ++i) {
         tile_encode_helper(output_vram + i, palette_ids + (i * 8), 0);
     }
@@ -48,8 +57,10 @@ void tile_encode_2bpp(uint16_t* output_vram, const uint8_t* palette_ids)
  * @param output_vram Pointer to destination buffer in VRAM
  * @param input_buf Pointer to input buffer of palette IDs
  */
-void tile_encode_4bpp(uint16_t* output_vram, const uint8_t* palette_ids)
+void tile_encode_4bpp(EncodedTile* output_vram, const Tile* tile)
 {
+    const uint8_t* palette_ids = tile->pixels;
+
     // First 16 bytes are bit planes 0 and 1
     for (size_t i = 0; i < 8; ++i) {
         tile_encode_helper(output_vram + i, palette_ids + (i * 8), 0);
@@ -66,8 +77,10 @@ void tile_encode_4bpp(uint16_t* output_vram, const uint8_t* palette_ids)
  * @param output_vram Pointer to destination buffer in VRAM
  * @param input_buf Pointer to input buffer of palette IDs
  */
-void tile_encode_8bpp(uint16_t* output_vram, const uint8_t* palette_ids)
+void tile_encode_8bpp(EncodedTile* output_vram, const Tile* tile)
 {
+    const uint8_t* palette_ids = tile->pixels;
+
     // First 16 bytes are bit planes 0 and 1
     for (size_t i = 0; i < 8; ++i) {
         tile_encode_helper(output_vram + i, palette_ids + (i * 8), 0);
@@ -93,7 +106,7 @@ void tile_encode_8bpp(uint16_t* output_vram, const uint8_t* palette_ids)
  * @param input_vram Pointer to input buffer of tile data in VRAM
  * @param shift Amount to shift the palette ID down before reading the value
  */
-void tile_decode_helper(
+static inline void tile_decode_helper(
         uint8_t* output_buf,
         uint16_t input_vram,
         const int shift
@@ -125,8 +138,10 @@ void tile_decode_helper(
  * @param output_buf Pointer to destination buffer of palette IDs
  * @param input_vram Pointer to input buffer of tile data in VRAM
  */
-void tile_decode_2bpp(uint8_t* output_buf, const uint16_t* input_vram)
+void tile_decode_2bpp(Tile* tile, const EncodedTile* input_vram)
 {
+    uint8_t* output_buf = tile->pixels;
+
     // One tile is 8 rows of 2 bytes each.
     for (size_t i = 0; i < 8; ++i) {
         tile_decode_helper(output_buf + (i * 8), input_vram[i], 0);
@@ -139,8 +154,10 @@ void tile_decode_2bpp(uint8_t* output_buf, const uint16_t* input_vram)
  * @param output_buf Pointer to destination buffer of palette IDs (size 64)
  * @param input_vram Pointer to input buffer of tile data in VRAM (size 16)
  */
-void tile_decode_4bpp(uint8_t* output_buf, const uint16_t* input_vram)
+void tile_decode_4bpp(Tile* tile, const EncodedTile* input_vram)
 {
+    uint8_t* output_buf = tile->pixels;
+
     // First 16 bytes are bit planes 0 and 1
     for (size_t i = 0; i < 8; ++i) {
         tile_decode_helper(output_buf + (i * 8), input_vram[i], 0);
@@ -157,8 +174,10 @@ void tile_decode_4bpp(uint8_t* output_buf, const uint16_t* input_vram)
  * @param output_buf Pointer to destination buffer of palette IDs
  * @param input_vram Pointer to input buffer of tile data in VRAM
  */
-void tile_decode_8bpp(uint8_t* output_buf, const uint16_t* input_vram)
+void tile_decode_8bpp(Tile* tile, const EncodedTile* input_vram)
 {
+    uint8_t* output_buf = tile->pixels;
+
     // First 16 bytes are bit planes 0 and 1
     for (size_t i = 0; i < 8; ++i) {
         tile_decode_helper(output_buf + (i * 8), input_vram[i], 0);
@@ -178,11 +197,17 @@ void tile_decode_8bpp(uint8_t* output_buf, const uint16_t* input_vram)
 }
 
 
+/* ===== Unused Stuff ===== */
 
 
-void translate_tile(uint32_t* output, uint8_t* input, size_t length, uint32_t bit_depth) {
+void translate_tile(
+    uint32_t* output,
+    uint8_t* input,
+    size_t length,
+    uint32_t bit_depth
+)
+{
     // TODO: Check bounds?
-
     switch (bit_depth) {
         case 2: {   // 2bpp, 4 colors
             // Alternate bytes: first LSB, then MSB

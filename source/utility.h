@@ -1,10 +1,16 @@
-//! Utility functions.
+/**
+ * Utility functions.
+ */
 
-#pragma once
+#ifndef SNES_3DS_UTILITY_H_
+#define SNES_3DS_UTILITY_H_
+
 
 /* ========== Includes ========== */
+
 #include <stddef.h>
 #include <stdint.h>
+
 
 /* ========== Functions ========== */
 
@@ -29,3 +35,6 @@ static inline void reverse_bytes(uint8_t* bytes, const size_t length)
         swap_u8(start_ptr++, end_ptr--);
     }
 }
+
+
+#endif  // SNES_3DS_UTILITY_H_

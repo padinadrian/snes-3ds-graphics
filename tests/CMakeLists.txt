@@ -2,13 +2,13 @@
 
 # List unit test source files
 add_executable(unittests
-    ${CMAKE_SOURCE_DIR}/source/background.c
     ${CMAKE_SOURCE_DIR}/source/cgram.c
-    background_tests.cpp
+    ${CMAKE_SOURCE_DIR}/source/tile.c
     cgram_bitmap_test.cpp
     cgram_tests.cpp
     palette_tests.cpp
     snes_objects_tests.cpp
+    tile_tests.cpp
     utility_tests.cpp
 )
 
