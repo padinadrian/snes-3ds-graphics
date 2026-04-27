@@ -29,6 +29,7 @@
 /* ===== Includes ===== */
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include "cgram.h"
 #include "texture.h"
@@ -145,30 +146,33 @@ inline void background_mode1(
 )
 {
     // const Tilemap* bg1_address = (const Tilemap*)(bgnsc[0].address << 9);
-    const Tilemap* bg2_tilemap = (const Tilemap*)(bgnsc[1].address << 9);
+    // const Tilemap* bg2_tilemap = (const Tilemap*)(bgnsc[1].address << 9);
+    const Tilemap* bg2_tilemap = (const Tilemap*)vram;
+    // const uint16_t* bg2_tileset_addr = vram + (get_bg2_address(bg12nba) >> 1);
+    const uint16_t* bg2_tileset_addr = vram + 0x2000;
 
     // Each tilemap is a 32x32 tile region
     // 32*32 = 1024 tiles
-    // TODO: These are going to be out of order - we don't care yet
-    Tile tile = {};
     for (size_t i = 0; i < TILEMAP_SIZE; i += 1)
     {
         const uint32_t tile_id = bg2_tilemap[i].tile_id;
         const uint32_t palette_id = bg2_tilemap[i].palette_id;
-
         decode_tile_to_texture_4bpp(
             output_buf,
-            &vram[tile_id],
-            cgram->palettes[palette_id].colors
+            &bg2_tileset_addr[tile_id << 4],
+            cgram->palettes[palette_id].colors,
+            bg2_tilemap[i].h_flip,
+            bg2_tilemap[i].v_flip
         );
+        if ((i % 32) == 31)
+        {
+            output_buf += (33 * 64);
+        }
+        else
+        {
+            output_buf += 64;
+        }
     }
-
-
-    // Shift down one because each
-    // const uint16_t* bg1_address = (const uint16_t*)(get_bg1_address(bg12nba) >> 1);
-    // const uint16_t* bg2_address = (const uint16_t*)(get_bg1_address(bg12nba) >> 1);
-
-    // TODO
 }
 
 

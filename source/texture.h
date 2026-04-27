@@ -9,6 +9,7 @@
 /* ===== Includes ===== */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "palette.h"
 #include "tile.h"
@@ -26,7 +27,9 @@
 void decode_tile_to_texture_4bpp(
     uint32_t* pixel_buffer,
     const EncodedTile* vram_ptr,
-    const PaletteColor* palette // Start of palette (8 colors)
+    const PaletteColor* palette, // Start of palette (8 colors)
+    const bool flip_horizontal,
+    const bool flip_vertical
 );
 
 

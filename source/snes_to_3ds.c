@@ -193,7 +193,9 @@ void update_snes_sprites(
             decode_tile_to_texture_4bpp(
                 pixel_buffer,
                 &vram_ptr[tile_id_offset],
-                cgram->palettes[palette_start].colors
+                cgram->palettes[palette_start].colors,
+                false,
+                false
             );
 
             // TODO: The actual sprite size is controlled by OBJSEL
@@ -203,17 +205,23 @@ void update_snes_sprites(
                 decode_tile_to_texture_4bpp(
                     pixel_buffer + 64,
                     &vram_ptr[tile_id_offset + 0x10],
-                    cgram->palettes[palette_start].colors
+                    cgram->palettes[palette_start].colors,
+                    false,
+                    false
                 );
                 decode_tile_to_texture_4bpp(
                     pixel_buffer + (2 * 64),
                     &vram_ptr[tile_id_offset + 0x100],
-                    cgram->palettes[palette_start].colors
+                    cgram->palettes[palette_start].colors,
+                    false,
+                    false
                 );
                 decode_tile_to_texture_4bpp(
                     pixel_buffer + (3 * 64),
                     &vram_ptr[tile_id_offset + 0x110],
-                    cgram->palettes[palette_start].colors
+                    cgram->palettes[palette_start].colors,
+                    false,
+                    false
                 );
             }
 
