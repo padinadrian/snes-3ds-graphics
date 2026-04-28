@@ -14,6 +14,7 @@
 
 #include "oam.h"
 #include "palette.h"
+#include "sprite.h"
 #include "texture.h"
 #include "tile.h"
 
@@ -30,12 +31,11 @@ const Tex3DS_SubTexture subtex_sprite = {
     0.0f, 1.0f, 1.0f, 0.0f  // left, top, right, bottom (??)
 };
 
-static bool dirty_flags[SNES_MAX_OBJECTS] = {};
 
 
 /* ===== Functions ===== */
 
-void init_default_palette()
+static void init_default_palette()
 {
     default_palette.colors[0] = encode_rgba_to_palette(0x00000000); // black
     default_palette.colors[1] = encode_rgba_to_palette(0xFF0000FF); // red
@@ -69,81 +69,6 @@ void init_snes_sprites()
     refresh_all_sprites();
 }
 
-void refresh_all_sprites()
-{
-    memset(dirty_flags, true, SNES_MAX_OBJECTS);
-}
-
-/** Set the sprite tile. */
-void snes_set_sprite_tile(
-        ObjectAttributeMemory* oam,
-        uint32_t sprite_id,
-        uint16_t tile_id
-)
-{
-    oam->low_table[sprite_id].tile_id = tile_id;
-    dirty_flags[sprite_id] = true;
-}
-
-/** Set the sprite position. */
-void snes_update_sprite_pos(
-        ObjectAttributeMemory* oam,
-        uint32_t sprite_id,
-        uint16_t x_pos, uint16_t y_pos
-)
-{
-    // X position high bit
-    uint32_t high_attr_index = sprite_id >> 2;
-    uint8_t offset = (sprite_id & 3) << 1;  // 0, 2, 4, or 6
-    uint8_t x_pos_msb = 1 << offset;
-    if (x_pos > 0xFF)
-    {
-        oam->high_table[high_attr_index] |= x_pos_msb;
-    }
-    else
-    {
-        oam->high_table[high_attr_index] &= ~x_pos_msb;
-    }
-
-    oam->low_table[sprite_id].x_pos = x_pos & 0xFF;
-    oam->low_table[sprite_id].y_pos = y_pos & 0xFF;
-
-    dirty_flags[sprite_id] = true;
-}
-
-/** Set horizontal flip on or off. */
-void snes_sprite_set_h_flip(
-        ObjectAttributeMemory* oam,
-        uint32_t sprite_id,
-        bool flip
-)
-{
-    oam->low_table[sprite_id].h_flip = flip;
-    dirty_flags[sprite_id] = true;
-}
-
-/** Set vertical flip on or off. */
-void snes_sprite_set_v_flip(
-        ObjectAttributeMemory* oam,
-        uint32_t sprite_id,
-        bool flip
-)
-{
-    oam->low_table[sprite_id].v_flip = flip;
-    dirty_flags[sprite_id] = true;
-}
-
-/** Set vertical flip on or off. */
-void snes_sprite_set_priority(
-        ObjectAttributeMemory* oam,
-        uint32_t sprite_id,
-        uint8_t priority
-)
-{
-    oam->low_table[sprite_id].priority = (priority & 3); // lower 2 bits only
-    dirty_flags[sprite_id] = true;
-}
-
 
 /** Update C2D sprites to reflect changes in the SNES objects. */
 void update_snes_sprites(
@@ -157,7 +82,7 @@ void update_snes_sprites(
 
     for (size_t i = 0; i < SNES_MAX_OBJECTS; ++i)
     {
-        if (dirty_flags[i])
+        if (snes_sprite_is_dirty(i))
         {
             // Update objects in reverse order
             // This ensures that the lowest objects are drawn last
@@ -247,7 +172,7 @@ void update_snes_sprites(
             sprite_ptr++;
         }
     }
-    memset(dirty_flags, false, SNES_MAX_OBJECTS);
+    clean_all_sprites();
 }
 
 void draw_snes_sprites()
