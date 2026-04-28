@@ -117,6 +117,7 @@ void decode_tile_to_texture_4bpp(
         const size_t pixel_id = pixel_index_lookup[i];
         if (color_id == 0)
         {
+            // pixel_buffer[pixel_id] = 0xFF80FFFF;
             pixel_buffer[pixel_id] = 0;
         }
         else

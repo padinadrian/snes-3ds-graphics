@@ -185,11 +185,6 @@ void update_snes_sprites(
             // TODO: For now we assume pages are contiguous (next page is 1)
             tile_id_offset += (snes_object.tile_page << 12);
 
-            // if ((SNES_MAX_OBJECTS - i) == 0)
-            // {
-            //     tile_id_offset = 0x420;
-            // }
-
             decode_tile_to_texture_4bpp(
                 pixel_buffer,
                 &vram_ptr[tile_id_offset],
@@ -223,6 +218,17 @@ void update_snes_sprites(
                     false,
                     false
                 );
+            }
+            else
+            {
+                if (snes_object.h_flip)
+                {
+                    snes_object.x_pos -= 8;
+                }
+                if (snes_object.v_flip)
+                {
+                    snes_object.y_pos -= 8;
+                }
             }
 
             // Set position
