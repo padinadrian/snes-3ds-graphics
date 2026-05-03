@@ -29,7 +29,8 @@
 /* ===== Includes ===== */
 
 #include <stdint.h>
-#include <stdio.h>
+
+#include <citro2d.h>
 
 #include "cgram.h"
 #include "texture.h"
@@ -92,6 +93,22 @@ typedef struct BG34NBA
     uint8_t bg4_address : 4;
 } BG34NBA_t;
 
+/// @brief Background object
+typedef struct Background
+{
+    C2D_Image image;
+    // X offset
+    float x;
+    // Y offset
+    float y;
+    // Depth between 0.0 and 1.0
+    float depth;
+    // Horizontal scale
+    float x_scale;
+    // Vertical scale
+    float y_scale;
+} Background;
+
 
 /* ===== Functions ===== */
 
@@ -119,61 +136,37 @@ inline uint32_t get_bg4_address(const BG34NBA_t reg)
     return (uint32_t)(reg.bg4_address) << 12;
 }
 
+
+// TODO: Should these be somewhere else?
+
 /**
- * @brief Background mode 1
+ * @brief Initialize backgrounds.
  *
- * BG1 = 4bpp (16 color)
- * BG2 = 4bpp (16 color)
- * BG3 = 2bpp (4 color)
+ * Must be called at the start of the program before any backgrounds are drawn.
+ */
+void init_backgrounds();
+
+/**
+ * @brief Update all the background images.
  *
- * Priority (front to back):
- * 3H S3 1H 2H S2 1L 2L S1 3H S0 3L
- *
- * @param[out] output_buf Output buffer to write pixel data to
  * @param[in] vram Pointer to VRAM
  * @param[in] cgram Pointer to CGRAM
- * @param[in] bgnsc BGnSC register value
- * @param[in] bg12nba BG12NBA register value
- * @param[in] bg34nba BG34NBA register value
+ * @param[in] bgnsc BGnSC registers
+ * @param[in] bg12nba BG12NBA register
+ * @param[in] bg34nba BG34NBA register
  */
-inline void background_mode1(
-    uint32_t* output_buf,
+void update_backgrounds(
     const uint16_t* vram,
     const CGRAM* cgram,
     const BGnSC_t bgnsc[4],
     const BG12NBA_t bg12nba,
     const BG34NBA_t bg34nba
-)
-{
-    // const Tilemap* bg1_address = (const Tilemap*)(bgnsc[0].address << 9);
-    // const Tilemap* bg2_tilemap = (const Tilemap*)(bgnsc[1].address << 9);
-    const Tilemap* bg2_tilemap = (const Tilemap*)vram;
-    // const uint16_t* bg2_tileset_addr = vram + (get_bg2_address(bg12nba) >> 1);
-    const uint16_t* bg2_tileset_addr = vram + 0x2000;
+);
 
-    // Each tilemap is a 32x32 tile region
-    // 32*32 = 1024 tiles
-    for (size_t i = 0; i < TILEMAP_SIZE; i += 1)
-    {
-        const uint32_t tile_id = bg2_tilemap[i].tile_id;
-        const uint32_t palette_id = bg2_tilemap[i].palette_id;
-        decode_tile_to_texture_4bpp(
-            output_buf,
-            &bg2_tileset_addr[tile_id << 4],
-            cgram->palettes[palette_id].colors,
-            bg2_tilemap[i].h_flip,
-            bg2_tilemap[i].v_flip
-        );
-        if ((i % 32) == 31)
-        {
-            output_buf += (33 * 64);
-        }
-        else
-        {
-            output_buf += 64;
-        }
-    }
-}
+/**
+ * @brief Draw all backgrounds.
+ */
+void draw_backgrounds();
 
 
 #endif  // SNES_3DS_BACKGROUND_H_

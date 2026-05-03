@@ -32,7 +32,6 @@ const Tex3DS_SubTexture subtex_sprite = {
 };
 
 
-
 /* ===== Functions ===== */
 
 static void init_default_palette()
@@ -62,7 +61,7 @@ void init_snes_sprites()
         C2D_SpriteSetCenter(sprite_ptr, 0.f, 0.f);
         C2D_SpriteSetPos(sprite_ptr, 255, 255); // init offscreen
         C2D_SpriteSetRotation(sprite_ptr, C3D_Angle(0.f));
-        C2D_SpriteSetDepth(sprite_ptr, 0.f);
+        C2D_SpriteSetDepth(sprite_ptr, 0.2f);
     }
 
     // Draw every sprite at least once on the first frame

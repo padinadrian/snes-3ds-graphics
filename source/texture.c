@@ -90,7 +90,7 @@ inline const size_t* select_pixel_index_lookup(
 
 void decode_tile_to_texture_4bpp(
     uint32_t* pixel_buffer,
-    const EncodedTile* vram_ptr,
+    const EncodedTile* tileset,
     const PaletteColor* palette, // Start of palette (8 colors)
     const bool flip_horizontal,
     const bool flip_vertical
@@ -98,7 +98,7 @@ void decode_tile_to_texture_4bpp(
 {
     // Each pixel is a 4-bit index (0-15).
     Tile tile = {};
-    tile_decode_4bpp(&tile, vram_ptr);
+    tile_decode_4bpp(&tile, tileset);
 
     // All sprites use 4bpp 16-color tiles. Each sprite selects one of
     // 8 palettes from the last half of CGRAM.
