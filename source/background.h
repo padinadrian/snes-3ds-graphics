@@ -164,9 +164,18 @@ void update_backgrounds(
 );
 
 /**
- * @brief Draw all backgrounds.
+ * @brief Draw background layers.
+ *
+ * The specific layers rendered are dependent on the background mode.
+ *
+ * @{
  */
-void draw_backgrounds();
+void draw_background_layer0();
+void draw_background_layer1();
+void draw_background_layer2();
+void draw_background_layer3();
+void draw_background_layer4();
+/** @} */
 
 
 #endif  // SNES_3DS_BACKGROUND_H_

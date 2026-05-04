@@ -68,7 +68,6 @@ void init_snes_sprites()
     refresh_all_sprites();
 }
 
-
 /** Update C2D sprites to reflect changes in the SNES objects. */
 void update_snes_sprites(
         ObjectAttributeMemory* oam,
@@ -166,6 +165,7 @@ void update_snes_sprites(
             // Priority can be 0-3. This determines depth relative to background.
             // Do not worry about sprite depth relative to each other.
             const float depth = (float)(snes_object.priority) / 4.0f;
+            // const float depth = 0.7f;
             C2D_SpriteSetDepth(sprite_ptr, depth);
 
             sprite_ptr++;
@@ -174,7 +174,10 @@ void update_snes_sprites(
     clean_all_sprites();
 }
 
-void draw_snes_sprites()
+/**
+ * @brief Draw sprites at a specific depth based on the given priority.
+ */
+void draw_sprites_priority(const float priority)
 {
     enum { MAX_DISPLAY_X_POS = 256 };
 
@@ -184,9 +187,33 @@ void draw_snes_sprites()
         sprite_ptr++
     )
     {
-        if (sprite_ptr->params.pos.x < MAX_DISPLAY_X_POS)
+        if ((priority == sprite_ptr->params.depth) && (sprite_ptr->params.pos.x < MAX_DISPLAY_X_POS))
         {
             C2D_DrawSprite(sprite_ptr);
         }
     }
+}
+
+/** Draw sprites with priority 0. */
+void draw_sprites_priority0()
+{
+    draw_sprites_priority(0.0f);
+}
+
+/** Draw sprites with priority 1. */
+void draw_sprites_priority1()
+{
+    draw_sprites_priority(0.25f);
+}
+
+/** Draw sprites with priority 2. */
+void draw_sprites_priority2()
+{
+    draw_sprites_priority(0.5f);
+}
+
+/** Draw sprites with priority 3. */
+void draw_sprites_priority3()
+{
+    draw_sprites_priority(0.75f);
 }
