@@ -38,7 +38,7 @@ void cgram_init(CGRAM* cgram_in)
 /**
  * @brief Set CGADD (offset to CGRAM write)
  */
-void set_cgadd(uint8_t cgadd_in)
+void set_cgadd(const uint8_t cgadd_in)
 {
     g_cgadd = cgadd_in;
 }
@@ -46,17 +46,18 @@ void set_cgadd(uint8_t cgadd_in)
 /**
  * @brief Write to CGRAM
  */
-void cgram_write(uint16_t val)
+void cgram_write(const uint16_t val)
 {
-    uint16_t* cgram_as_u16 = (uint16_t*)&g_cgram;
-    uint16_t* color_ptr = &cgram_as_u16[g_cgadd];
-    if (g_write_offset == 0) {
+    uint16_t* colors_ptr = (uint16_t*)g_cgram;
+    if (g_write_offset == 0)
+    {
         // First write
-        *color_ptr = val;
+        colors_ptr[g_cgadd] |= (val & 0xFF);
     }
-    else {
+    else
+    {
         // Second write - increment CGADD
-        *color_ptr |= val << 8;
+        colors_ptr[g_cgadd] |= (val << 8);
         g_cgadd += 1;
     }
     g_write_offset = !g_write_offset;
