@@ -1,4 +1,6 @@
 /**
+ * Handle backgrounds.
+ *
  * SNES backgrounds consist of one or more layers of tilemaps.
  *
  * There are 8 available background modes, which can be
@@ -37,32 +39,7 @@
 #include "tile.h"
 
 
-/* ===== Enums ===== */
-
-enum { TILEMAP_WIDTH = 32 };
-enum { TILEMAP_HEIGHT = 32 };
-enum { TILEMAP_SIZE = (32 * 32) };  // 1024
-
-
 /* ===== Structs ===== */
-
-/**
- * Tilemap object; contains info on a single tile in a background.
- *
- * Size: 16 bits (2 bytes)
- */
-typedef struct Tilemap {
-    /// @brief Tile index: Select one of 1024 from VRAM relative to base address
-    uint16_t tile_id : 10;
-    /// @brief Palette selection: 0-7 selects one of up to 8 palettes from CGRAM
-    uint8_t palette_id : 3;
-    /// @brief Priority: Background = 0, foreground = 1
-    uint8_t priority : 1;
-    /// @brief Flip horizontal
-    uint8_t h_flip : 1;
-    /// @brief Flip vertical
-    uint8_t v_flip : 1;
-} Tilemap;
 
 /// @brief BG1-4 tilemap address and size ($2107-$210A)
 typedef struct BGnSC

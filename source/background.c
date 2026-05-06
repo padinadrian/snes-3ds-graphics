@@ -15,10 +15,12 @@
 #include "cgram.h"
 #include "texture.h"
 #include "tile.h"
+#include "tilemap.h"
 
 
 /* ===== Data ===== */
 
+/** Four background layers each with an upper and lower layer. */
 typedef enum BackgroundId {
     BACKGROUND_LAYER_4L,
     BACKGROUND_LAYER_4H,
@@ -37,8 +39,6 @@ enum {
     BG_TEX_HEIGHT = 256,
 };
 
-enum { PIXELS_PER_TILE = 64 };
-
 static C3D_Tex c3d_bg_textures[NUM_BACKGROUNDS] = {};
 static Background backgrounds[NUM_BACKGROUNDS] = {};
 static bool dirtyFlags[NUM_BACKGROUNDS] = {};
@@ -54,53 +54,12 @@ const Tex3DS_SubTexture bg_subtex = {
 /* ----- Helper Functions ----- */
 
 /**
- * @brief Decode a tilemap into a background image.
- *
- * @param[out] output_buf Output pixel buffer
- * @param[in] tilemap Pointer to tilemap with tile and color info
- * @param[in] tileset Pointer to vram section containing tile data
- * @param[in] cgram Color palette
- */
-inline void decode_background_4bpp(
-    uint32_t* output_buf,
-    const Tilemap* tilemap,
-    const EncodedTile* tileset,
-    const CGRAM* cgram,
-    const bool priority
-)
-{
-    // Each tilemap is a 32x32 tile region
-    // 32*32 = 1024 tiles
-    for (size_t i = 0; i < TILEMAP_SIZE; i += 1)
-    {
-        if (priority == tilemap[i].priority)
-        {
-            const uint32_t tile_id = tilemap[i].tile_id;
-            const uint32_t palette_id = tilemap[i].palette_id;
-            decode_tile_to_texture_4bpp(
-                output_buf,
-                &tileset[tile_id << 4],
-                cgram->palettes[palette_id].colors,
-                tilemap[i].h_flip,
-                tilemap[i].v_flip
-            );
-        }
-        else
-        {
-            memset(output_buf, 0, PIXELS_PER_TILE);
-        }
-        output_buf += PIXELS_PER_TILE;
-    }
-}
-
-/**
  * @brief Get the direct pixel buffer for the given background layer.
  */
 static uint32_t* get_layer_pixel_buffer(size_t layer_id)
 {
     return (uint32_t*)(backgrounds[layer_id].image.tex->data);
 }
-
 
 
 /* ----- Background Modes ----- */
@@ -132,28 +91,28 @@ static void background_mode1(
     const uint16_t* bg1_tileset_addr = vram + 0x2000;
     const uint16_t* bg2_tileset_addr = vram + 0x2000;
 
-    decode_background_4bpp(
+    decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_2L),
         bg2_tilemap,
         bg2_tileset_addr,
         cgram,
         false
     );
-    decode_background_4bpp(
+    decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_1L),
         bg1_tilemap,
         bg1_tileset_addr,
         cgram,
         false
     );
-    decode_background_4bpp(
+    decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_2H),
         bg2_tilemap,
         bg2_tileset_addr,
         cgram,
         true
     );
-    decode_background_4bpp(
+    decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_1H),
         bg1_tilemap,
         bg1_tileset_addr,
