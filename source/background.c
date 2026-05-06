@@ -62,6 +62,56 @@ static uint32_t* get_layer_pixel_buffer(size_t layer_id)
 }
 
 
+/** @brief Get background 1 tilemap address. */
+inline uint32_t get_bg1_tilemap(const BGnSC_t* bgnsc)
+{
+    return bgnsc[0].tilemap << 9;
+}
+
+/** @brief Get background 2 tilemap address. */
+inline uint32_t get_bg2_tilemap(const BGnSC_t* bgnsc)
+{
+    return bgnsc[1].tilemap << 9;
+}
+
+/** @brief Get background 3 tilemap address. */
+inline uint32_t get_bg3_tilemap(const BGnSC_t* bgnsc)
+{
+    return bgnsc[2].tilemap << 9;
+}
+
+/** @brief Get background 4 tilemap address. */
+inline uint32_t get_bg4_tilemap(const BGnSC_t* bgnsc)
+{
+    return bgnsc[3].tilemap << 9;
+}
+
+/** @brief Get background 1 tileset address. */
+inline uint32_t get_bg1_tileset(const BG12NBA_t reg)
+{
+    return (uint32_t)(reg.bg1_tileset) << 11;
+}
+
+/** @brief Get background 2 tileset address. */
+inline uint32_t get_bg2_tileset(const BG12NBA_t reg)
+{
+    return (uint32_t)(reg.bg2_tileset) << 11;
+}
+
+/** @brief Get background 3 tileset address. */
+inline uint32_t get_bg3_tileset(const BG34NBA_t reg)
+{
+    return (uint32_t)(reg.bg3_tileset) << 11;
+}
+
+/** @brief Get background 4 tileset address. */
+inline uint32_t get_bg4_tileset(const BG34NBA_t reg)
+{
+    return (uint32_t)(reg.bg4_tileset) << 11;
+}
+
+
+
 /* ----- Background Modes ----- */
 
 /**
@@ -83,39 +133,41 @@ static void background_mode1(
 )
 {
     // TODO: Actually use the registers properly
-    // const Tilemap* bg1_address = (const Tilemap*)(bgnsc[0].address << 9);
-    // const Tilemap* bg2_tilemap = (const Tilemap*)(bgnsc[1].address << 9);
-    const Tilemap* bg1_tilemap = (const Tilemap*)(vram + 0x1000);
-    const Tilemap* bg2_tilemap = (const Tilemap*)vram;
-    // const uint16_t* bg1_tileset_addr = vram + (get_bg2_address(bg12nba) >> 1);
-    const uint16_t* bg1_tileset_addr = vram + 0x2000;
-    const uint16_t* bg2_tileset_addr = vram + 0x2000;
+    const size_t bg1_tilemap_offset = get_bg1_tilemap(bgnsc);
+    const size_t bg2_tilemap_offset = get_bg2_tilemap(bgnsc);
+    const Tilemap* bg1_tilemap = (const Tilemap*)(vram + bg1_tilemap_offset);
+    const Tilemap* bg2_tilemap = (const Tilemap*)(vram + bg2_tilemap_offset);
+
+    const size_t bg1_tileset_offset = get_bg1_tileset(bg12nba);
+    const size_t bg2_tileset_offset = get_bg2_tileset(bg12nba);
+    const EncodedTile* bg1_tileset = (const EncodedTile*)(vram + bg1_tileset_offset);
+    const EncodedTile* bg2_tileset = (const EncodedTile*)(vram + bg2_tileset_offset);
 
     decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_2L),
         bg2_tilemap,
-        bg2_tileset_addr,
+        bg2_tileset,
         cgram,
         false
     );
     decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_1L),
         bg1_tilemap,
-        bg1_tileset_addr,
+        bg1_tileset,
         cgram,
         false
     );
     decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_2H),
         bg2_tilemap,
-        bg2_tileset_addr,
+        bg2_tileset,
         cgram,
         true
     );
     decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_1H),
         bg1_tilemap,
-        bg1_tileset_addr,
+        bg1_tileset,
         cgram,
         true
     );

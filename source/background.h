@@ -49,25 +49,25 @@ typedef struct BGnSC
     /// @brief Vertical tilemap count (0 = 1 tilemap, 1 = 2 tilemaps)
     uint8_t y: 1;
     /// @brief Tilemap VRAM address (word address = AAAAAA << 10)
-    uint8_t address: 6;
+    uint8_t tilemap: 6;
 } BGnSC_t;
 
 /// @brief CHR word base addresses for BG1 and BG2 ($210B)
 typedef struct BG12NBA
 {
     /// @brief BG1 CHR word base address (word address = AAAA << 12)
-    uint8_t bg1_address : 4;
+    uint8_t bg1_tileset : 4;
     /// @brief BG2 CHR word base address (word address = BBBB << 12)
-    uint8_t bg2_address : 4;
+    uint8_t bg2_tileset : 4;
 } BG12NBA_t;
 
 /// @brief CHR word base addresses for BG3 and BG4 ($210C)
 typedef struct BG34NBA
 {
     /// @brief BG3 CHR word base address (word address = CCCC << 12)
-    uint8_t bg3_address : 4;
+    uint8_t bg3_tileset : 4;
     /// @brief BG4 CHR word base address (word address = DDDD << 12)
-    uint8_t bg4_address : 4;
+    uint8_t bg4_tileset : 4;
 } BG34NBA_t;
 
 /// @brief Background object
@@ -88,31 +88,6 @@ typedef struct Background
 
 
 /* ===== Functions ===== */
-
-/** @brief Get background 1 start address. */
-inline uint32_t get_bg1_address(const BG12NBA_t reg)
-{
-    return (uint32_t)(reg.bg1_address) << 12;
-}
-
-/** @brief Get background 2 start address. */
-inline uint32_t get_bg2_address(const BG12NBA_t reg)
-{
-    return (uint32_t)(reg.bg2_address) << 12;
-}
-
-/** @brief Get background 3 start address. */
-inline uint32_t get_bg3_address(const BG34NBA_t reg)
-{
-    return (uint32_t)(reg.bg3_address) << 12;
-}
-
-/** @brief Get background 4 start address. */
-inline uint32_t get_bg4_address(const BG34NBA_t reg)
-{
-    return (uint32_t)(reg.bg4_address) << 12;
-}
-
 
 // TODO: Should these be somewhere else?
 
