@@ -24,7 +24,7 @@
 static C3D_Tex c3d_sprite_tex[SNES_MAX_OBJECTS];
 static C2D_Sprite c2d_sprites[SNES_MAX_OBJECTS];
 
-static Palette default_palette;
+static PaletteColor default_palette[8];
 
 const Tex3DS_SubTexture subtex_sprite = {
     16, 16,       // width, height
@@ -36,14 +36,14 @@ const Tex3DS_SubTexture subtex_sprite = {
 
 static void init_default_palette()
 {
-    default_palette.colors[0] = encode_rgba_to_palette(0x00000000); // black
-    default_palette.colors[1] = encode_rgba_to_palette(0xFF0000FF); // red
-    default_palette.colors[2] = encode_rgba_to_palette(0x00FF00FF); // green
-    default_palette.colors[3] = encode_rgba_to_palette(0x0000FFFF); // blue
-    default_palette.colors[4] = encode_rgba_to_palette(0xFFFF00FF); // yellow
-    default_palette.colors[5] = encode_rgba_to_palette(0x00FFFFFF); // teal
-    default_palette.colors[6] = encode_rgba_to_palette(0xFF00FFFF); // magenta
-    default_palette.colors[7] = encode_rgba_to_palette(0xFFFFFFFF); // white
+    default_palette[0] = encode_rgba_to_palette(0x00000000); // black
+    default_palette[1] = encode_rgba_to_palette(0xFF0000FF); // red
+    default_palette[2] = encode_rgba_to_palette(0x00FF00FF); // green
+    default_palette[3] = encode_rgba_to_palette(0x0000FFFF); // blue
+    default_palette[4] = encode_rgba_to_palette(0xFFFF00FF); // yellow
+    default_palette[5] = encode_rgba_to_palette(0x00FFFFFF); // teal
+    default_palette[6] = encode_rgba_to_palette(0xFF00FFFF); // magenta
+    default_palette[7] = encode_rgba_to_palette(0xFFFFFFFF); // white
 }
 
 void init_snes_sprites()
@@ -78,6 +78,8 @@ void update_snes_sprites(
     Object snes_object;
     C2D_Sprite* sprite_ptr = c2d_sprites;
 
+    const PaletteColor* sprite_palettes = cgram->colors + 128;
+
     for (size_t i = 0; i < SNES_MAX_OBJECTS; ++i)
     {
         if (snes_sprite_is_dirty(i))
@@ -97,7 +99,7 @@ void update_snes_sprites(
 
             // All sprites use 4bpp 16-color tiles. Each sprite selects one of
             // 8 palettes from the last half of CGRAM.
-            const uint8_t palette_start = (snes_object.palette_id + 8);
+            const uint32_t palette_id = snes_object.palette_id << 4;
 
             // Tiles are spaced 32 bytes apart in memory
             // However, vram is uint16_t so divide by 2 bytes
@@ -111,7 +113,7 @@ void update_snes_sprites(
             decode_tile_to_texture_4bpp(
                 pixel_buffer,
                 &vram_ptr[tile_id_offset],
-                cgram->palettes[palette_start].colors,
+                &sprite_palettes[palette_id],
                 false,
                 false
             );
@@ -123,21 +125,21 @@ void update_snes_sprites(
                 decode_tile_to_texture_4bpp(
                     pixel_buffer + 64,
                     &vram_ptr[tile_id_offset + 0x10],
-                    cgram->palettes[palette_start].colors,
+                    &sprite_palettes[palette_id],
                     false,
                     false
                 );
                 decode_tile_to_texture_4bpp(
                     pixel_buffer + (2 * 64),
                     &vram_ptr[tile_id_offset + 0x100],
-                    cgram->palettes[palette_start].colors,
+                    &sprite_palettes[palette_id],
                     false,
                     false
                 );
                 decode_tile_to_texture_4bpp(
                     pixel_buffer + (3 * 64),
                     &vram_ptr[tile_id_offset + 0x110],
-                    cgram->palettes[palette_start].colors,
+                    &sprite_palettes[palette_id],
                     false,
                     false
                 );

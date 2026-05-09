@@ -25,7 +25,7 @@ TEST(CgramTest, CgramWrite)
     cgram_write(0x55);
     cgram_write(0x66);
 
-    const uint16_t* colors_ptr = cgram.palettes[0].colors;
+    const uint16_t* colors_ptr = cgram.colors;
 
     EXPECT_EQ(colors_ptr[127], 0x2211);
     EXPECT_EQ(colors_ptr[128], 0x4433);

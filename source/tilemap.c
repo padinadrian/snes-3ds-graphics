@@ -39,16 +39,11 @@ void decode_tilemap_2bpp(
         if (priority == tilemap[i].priority)
         {
             const uint32_t tile_id = tilemap[i].tile_id << 3;
-
-            // TODO: Fix palette selection math
-            // In 2bpp, each palette is only four colors
             const uint32_t palette_id = tilemap[i].palette_id << 2;
-            const uint16_t* palette_ptr = &(cgram->palettes[0].colors[palette_id]);
-
             decode_tile_to_texture_2bpp(
                 output_buf,
                 &tileset[tile_id],
-                palette_ptr,
+                &(cgram->colors[palette_id]),
                 tilemap[i].h_flip,
                 tilemap[i].v_flip
             );
@@ -77,11 +72,11 @@ void decode_tilemap_4bpp(
         if (priority == tilemap[i].priority)
         {
             const uint32_t tile_id = tilemap[i].tile_id << 4;
-            const uint32_t palette_id = tilemap[i].palette_id;
+            const uint32_t palette_id = tilemap[i].palette_id << 4;
             decode_tile_to_texture_4bpp(
                 output_buf,
                 &tileset[tile_id],
-                cgram->palettes[palette_id].colors,
+                &(cgram->colors[palette_id]),
                 tilemap[i].h_flip,
                 tilemap[i].v_flip
             );

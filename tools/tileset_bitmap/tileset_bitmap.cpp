@@ -52,7 +52,7 @@ void copy_to_bitmap(
         const int bpp
 )
 {
-    const PaletteColor* palette = cgram.palettes[12].colors;
+    const PaletteColor* palette = cgram.colors + 0xC0;
 
     int bit_offset = 8 - bpp;
     for (size_t y = 0; y < 8; y += 1)

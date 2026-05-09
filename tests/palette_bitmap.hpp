@@ -29,7 +29,7 @@ inline size_t read_cgram(CGRAM* cgram, const char* cgram_file)
     {
         return 0;
     }
-    return fread(cgram->palettes[0].colors, 2, NUM_CGRAM_COLORS, fp);
+    return fread(cgram->colors, 2, NUM_CGRAM_COLORS, fp);
 }
 
 /**
@@ -38,7 +38,7 @@ inline size_t read_cgram(CGRAM* cgram, const char* cgram_file)
 inline void generate_palette_bitmap(CGRAM* cgram, const char* output_file)
 {
     bitmap_image image{16, 16};
-    PaletteColorBits* colors_ptr = (PaletteColorBits*)(cgram->palettes[0].colors);
+    PaletteColorBits* colors_ptr = (PaletteColorBits*)(cgram->colors);
     for (int y = 0; y < 16; y += 1)
     {
         for (int x = 0; x < 16; x += 1)

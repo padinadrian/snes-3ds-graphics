@@ -13,9 +13,7 @@
 
 /* ===== Enums ===== */
 
-enum { COLORS_PER_PALETTE = 16 };
-enum { NUM_PALETTES = 16 };
-enum { NUM_CGRAM_COLORS = NUM_PALETTES * COLORS_PER_PALETTE }; // 256
+enum { NUM_CGRAM_COLORS = 256 }; // 256
 enum { CGRAM_SIZE = NUM_CGRAM_COLORS * 2 }; // 512
 
 enum {
@@ -44,14 +42,9 @@ typedef struct {
     uint8_t _unused : 1;
 } PaletteColorBits;
 
-// A palette consists of one row of 16 colors.
-typedef struct Palette {
-    PaletteColor colors[COLORS_PER_PALETTE];
-} Palette;
-
 // Collection of palletes contained in CGRAM.
 typedef struct {
-    Palette palettes[NUM_PALETTES];
+    PaletteColor colors[NUM_CGRAM_COLORS];
 } CGRAM;
 
 
