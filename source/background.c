@@ -135,25 +135,36 @@ static void background_mode1(
     // TODO: Actually use the registers properly
     const size_t bg1_tilemap_offset = get_bg1_tilemap(bgnsc);
     const size_t bg2_tilemap_offset = get_bg2_tilemap(bgnsc);
+    const size_t bg3_tilemap_offset = get_bg3_tilemap(bgnsc);
     const Tilemap* bg1_tilemap = (const Tilemap*)(vram + bg1_tilemap_offset);
     const Tilemap* bg2_tilemap = (const Tilemap*)(vram + bg2_tilemap_offset);
+    const Tilemap* bg3_tilemap = (const Tilemap*)(vram + bg3_tilemap_offset);
 
     const size_t bg1_tileset_offset = get_bg1_tileset(bg12nba);
     const size_t bg2_tileset_offset = get_bg2_tileset(bg12nba);
+    const size_t bg3_tileset_offset = get_bg3_tileset(bg34nba);
     const EncodedTile* bg1_tileset = (const EncodedTile*)(vram + bg1_tileset_offset);
     const EncodedTile* bg2_tileset = (const EncodedTile*)(vram + bg2_tileset_offset);
+    const EncodedTile* bg3_tileset = (const EncodedTile*)(vram + bg3_tileset_offset);
 
-    decode_tilemap_4bpp(
-        get_layer_pixel_buffer(BACKGROUND_LAYER_2L),
-        bg2_tilemap,
-        bg2_tileset,
-        cgram,
-        false
-    );
     decode_tilemap_4bpp(
         get_layer_pixel_buffer(BACKGROUND_LAYER_1L),
         bg1_tilemap,
         bg1_tileset,
+        cgram,
+        false
+    );
+    decode_tilemap_4bpp(
+        get_layer_pixel_buffer(BACKGROUND_LAYER_1H),
+        bg1_tilemap,
+        bg1_tileset,
+        cgram,
+        true
+    );
+    decode_tilemap_4bpp(
+        get_layer_pixel_buffer(BACKGROUND_LAYER_2L),
+        bg2_tilemap,
+        bg2_tileset,
         cgram,
         false
     );
@@ -164,29 +175,35 @@ static void background_mode1(
         cgram,
         true
     );
-    decode_tilemap_4bpp(
-        get_layer_pixel_buffer(BACKGROUND_LAYER_1H),
-        bg1_tilemap,
-        bg1_tileset,
+    decode_tilemap_2bpp(
+        get_layer_pixel_buffer(BACKGROUND_LAYER_3L),
+        bg3_tilemap,
+        bg3_tileset,
+        cgram,
+        false
+    );
+    decode_tilemap_2bpp(
+        get_layer_pixel_buffer(BACKGROUND_LAYER_3H),
+        bg3_tilemap,
+        bg3_tileset,
         cgram,
         true
     );
 
-    // TODO: Layer 3
 
-    // TODO: Optimization: Don't do this every frame
     backgrounds[BACKGROUND_LAYER_4L].depth = 0.0f;
     backgrounds[BACKGROUND_LAYER_4H].depth = 0.0f;
     backgrounds[BACKGROUND_LAYER_3L].depth = 0.0f;
     backgrounds[BACKGROUND_LAYER_3H].depth = 0.1f;
-    // Note: This does not match the documentation I have found but it
-    // does render the layers in the correct order.
+    // Note: This does not match the documentation I have found,
+    // but it does render the layers in the correct order.
     backgrounds[BACKGROUND_LAYER_2L].depth = 0.2f;
     backgrounds[BACKGROUND_LAYER_1L].depth = 0.4f;
     backgrounds[BACKGROUND_LAYER_2H].depth = 0.6f;
     backgrounds[BACKGROUND_LAYER_1H].depth = 0.7f;
 
-    // TODO: Layer 3
+    // TODO: Background 3H can sometimes be at the top
+    backgrounds[BACKGROUND_LAYER_3H].depth = 0.9f;
 }
 
 
@@ -274,7 +291,8 @@ void draw_background_layer1()
     // Mode 2-8: 1L
 
     // TODO: Assume background mode 1
-    draw_background(BACKGROUND_LAYER_3H);
+    // TODO: For Mode 1, 3H may change position based on priority
+    // draw_background(BACKGROUND_LAYER_3H);
     // Note: this does not match the documentation I have found but it
     // does render the layers in the correct order.
     draw_background(BACKGROUND_LAYER_2L);
@@ -308,6 +326,6 @@ void draw_background_layer4()
 
     // TODO: Assume background mode 1
     // TODO: For Mode 1, 3H may change position based on priority
-    // draw_background(BACKGROUND_LAYER_3H);
+    draw_background(BACKGROUND_LAYER_3H);
 }
 

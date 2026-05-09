@@ -39,14 +39,49 @@ typedef struct Tilemap {
 /* ===== Functions ===== */
 
 /**
- * @brief Decode a tilemap into a background image.
+ * @brief Decode a tilemap into a background image, 2-bit color depth.
  *
  * @param[out] output_buf Output pixel buffer
  * @param[in] tilemap Pointer to tilemap with tile and color info
  * @param[in] tileset Pointer to vram section containing tile data
  * @param[in] cgram Color palette
+ * @param[in] priority Determines if priority is high or low
+ */
+void decode_tilemap_2bpp(
+    uint32_t* output_buf,
+    const Tilemap* tilemap,
+    const EncodedTile* tileset,
+    const CGRAM* cgram,
+    const bool priority
+);
+
+/**
+ * @brief Decode a tilemap into a background image, 4-bit color depth.
+ *
+ * @param[out] output_buf Output pixel buffer
+ * @param[in] tilemap Pointer to tilemap with tile and color info
+ * @param[in] tileset Pointer to vram section containing tile data
+ * @param[in] cgram Color palette
+ * @param[in] priority Determines if priority is high or low
  */
 void decode_tilemap_4bpp(
+    uint32_t* output_buf,
+    const Tilemap* tilemap,
+    const EncodedTile* tileset,
+    const CGRAM* cgram,
+    const bool priority
+);
+
+/**
+ * @brief Decode a tilemap into a background image, 8-bit color depth.
+ *
+ * @param[out] output_buf Output pixel buffer
+ * @param[in] tilemap Pointer to tilemap with tile and color info
+ * @param[in] tileset Pointer to vram section containing tile data
+ * @param[in] cgram Color palette
+ * @param[in] priority Determines if priority is high or low
+ */
+void decode_tilemap_8bpp(
     uint32_t* output_buf,
     const Tilemap* tilemap,
     const EncodedTile* tileset,
